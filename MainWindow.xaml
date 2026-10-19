@@ -47,6 +47,26 @@
                     </StackPanel>
 
                     <StackPanel DockPanel.Dock="Bottom">
+                        <!-- Aviso de versão nova (só aparece quando há) -->
+                        <Border x:Name="UpdateBanner" Visibility="Collapsed" Background="{StaticResource GlassBrush}"
+                                CornerRadius="12" Padding="14,10,8,12" Margin="0,0,0,12">
+                            <StackPanel>
+                                <DockPanel>
+                                    <Button DockPanel.Dock="Right" Style="{StaticResource LinkButton}" Padding="6,2"
+                                            Click="DismissUpdate_Click" ToolTip="{l:Tr Upd_Dismiss}" VerticalAlignment="Top">
+                                        <TextBlock Text="&#xE711;" Style="{StaticResource Icon}" FontSize="10"/>
+                                    </Button>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#xE896;" Style="{StaticResource Icon}" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                        <TextBlock Text="{l:Tr Upd_Available}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </DockPanel>
+                                <TextBlock x:Name="UpdateVersionText" Foreground="{StaticResource SubtleTextBrush}" FontSize="12.5"
+                                           TextWrapping="Wrap" Margin="0,4,6,10"/>
+                                <Button Style="{StaticResource PrimaryButton}" Padding="14,6" FontSize="13.5" HorizontalAlignment="Left"
+                                        Click="OpenUpdate_Click" Content="{l:Tr Upd_Download}"/>
+                            </StackPanel>
+                        </Border>
                         <RadioButton x:Name="NavSettings" Style="{StaticResource NavItem}" Click="NavSettings_Click">
                             <DockPanel>
                                 <TextBlock Text="&#xE713;" Style="{StaticResource Icon}" Width="26"/>

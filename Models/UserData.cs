@@ -54,7 +54,37 @@ public sealed class PlaySession
 
 public sealed class AppSettings
 {
-    public string? SteamGridDbKey { get; set; }
+    /// <summary>Chave do SteamGridDB, cifrada com a DPAPI do Windows (ver <see cref="GameLauncher.Services.Secrets"/>).</summary>
+    public string? SteamGridDbKeyProtected { get; set; }
+
+    /// <summary>Versões até à 1.0.2 guardavam a chave em texto simples aqui. Só é lida (para migrar) e depois apagada.</summary>
+    [System.Text.Json.Serialization.JsonPropertyName("SteamGridDbKey")]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public string? LegacySteamGridDbKey { get; set; }
+
+    private string? _keyCache;
+
+    /// <summary>A chave já decifrada (não é gravada assim no ficheiro).</summary>
+    [System.Text.Json.Serialization.JsonIgnore]
+    public string? SteamGridDbKey
+    {
+        get => _keyCache ??= GameLauncher.Services.Secrets.Unprotect(SteamGridDbKeyProtected);
+        set
+        {
+            _keyCache = string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+            SteamGridDbKeyProtected = GameLauncher.Services.Secrets.Protect(_keyCache);
+            // Se a cifra falhar (raro), não perde a chave: fica como estava.
+            LegacySteamGridDbKey = SteamGridDbKeyProtected is null ? _keyCache : null;
+        }
+    }
+
+    /// <summary>Converte a chave antiga (texto simples) para a versão cifrada. Devolve true se mudou algo.</summary>
+    public bool MigrateSecrets()
+    {
+        if (string.IsNullOrWhiteSpace(LegacySteamGridDbKey)) { LegacySteamGridDbKey = null; return false; }
+        SteamGridDbKey = LegacySteamGridDbKey;
+        return LegacySteamGridDbKey is null;
+    }
     public bool StartFullscreen { get; set; }
     public string LibrarySort { get; set; } = "recent";
 
@@ -66,6 +96,18 @@ public sealed class AppSettings
 
     /// <summary>No Início e na página do jogo, usar a cor da capa do jogo.</summary>
     public bool UseGameColors { get; set; } = true;
+
+    /// <summary>Fechar a janela deixa a app a correr na área de notificação (continua a contar o tempo de jogo).</summary>
+    public bool CloseToTray { get; set; }
+
+    /// <summary>Ver no GitHub, ao abrir, se há uma versão nova.</summary>
+    public bool CheckForUpdates { get; set; } = true;
+
+    /// <summary>Versão nova cujo aviso foi fechado (não volta a aparecer para esta versão).</summary>
+    public string? DismissedUpdate { get; set; }
+
+    /// <summary>Já se explicou que a app ficou na área de notificação (só se diz uma vez).</summary>
+    public bool TrayHintShown { get; set; }
 
     /// <summary>Tamanho e posição da janela da última vez (null = ainda não há).</summary>
     public WindowPlacement? Window { get; set; }

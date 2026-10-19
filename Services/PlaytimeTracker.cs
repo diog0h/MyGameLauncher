@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using System.Runtime.InteropServices;
+using System.Text;
 using GameLauncher.Models;
 
 namespace GameLauncher.Services;
@@ -7,6 +9,9 @@ namespace GameLauncher.Services;
 /// Vigia os processos do Windows e percebe quando um jogo está aberto, comparando
 /// os executáveis em execução com os .exe que existem na pasta de cada jogo.
 /// Funciona com jogos abertos por esta app ou diretamente pela Steam.
+/// Para não contar tempo a programas que só têm o mesmo nome, confirma sempre que o processo
+/// está mesmo dentro da pasta do jogo; só usa o nome sozinho quando o Windows não deixa ler o caminho
+/// (ex.: jogos com anti-batota) e o nome não é genérico.
 /// </summary>
 public sealed class PlaytimeTracker : IDisposable
 {
@@ -27,7 +32,48 @@ public sealed class PlaytimeTracker : IDisposable
         "unitycrashhandler", "ue4prereq", "prereq", "helper", "touchup", "cleanup",
     };
 
+    // Nomes demasiado comuns para identificar um jogo só pelo nome.
+    private static readonly HashSet<string> GenericNames = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "launcher", "game", "start", "play", "client", "bootstrap", "bootstrapper", "main", "app",
+        "run", "server", "editor", "config", "settings", "launch", "update", "x64", "win64", "shipping",
+    };
+
     private int _generation;
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    private static extern IntPtr OpenProcess(uint access, bool inherit, int processId);
+
+    [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    private static extern bool QueryFullProcessImageName(IntPtr process, int flags, StringBuilder exeName, ref int size);
+
+    [DllImport("kernel32.dll")]
+    private static extern bool CloseHandle(IntPtr handle);
+
+    private const uint ProcessQueryLimitedInformation = 0x1000;
+
+    /// <summary>
+    /// Caminho completo do executável. Usa o acesso "limitado" do Windows, que funciona mesmo com
+    /// muitos processos protegidos e com programas de 32 bits (ao contrário de Process.MainModule).
+    /// </summary>
+    private static string? GetProcessPath(int pid)
+    {
+        var handle = OpenProcess(ProcessQueryLimitedInformation, false, pid);
+        if (handle == IntPtr.Zero) return null;
+        try
+        {
+            var sb = new StringBuilder(1024);
+            int size = sb.Capacity;
+            return QueryFullProcessImageName(handle, 0, sb, ref size) ? sb.ToString(0, size) : null;
+        }
+        finally { CloseHandle(handle); }
+    }
+
+    private static bool IsInside(string path, string folder)
+    {
+        var f = folder.TrimEnd('\\', '/') + "\\";
+        return path.StartsWith(f, StringComparison.OrdinalIgnoreCase);
+    }
 
     public void Start(IEnumerable<Game> games)
     {
@@ -103,19 +149,18 @@ public sealed class PlaytimeTracker : IDisposable
                     {
                         if (!_exeIndex.TryGetValue(p.ProcessName, out var owners)) continue;
 
-                        if (owners.Count == 1)
+                        var path = GetProcessPath(p.Id);
+                        if (path is not null)
                         {
-                            nowRunning.Add(owners[0].Game);
-                            continue;
+                            // Caminho conhecido: só conta se o .exe estiver dentro da pasta do jogo.
+                            foreach (var o in owners)
+                                if (IsInside(path, o.Folder)) nowRunning.Add(o.Game);
                         }
-
-                        // Nome repetido em vários jogos (ex.: "launcher"): confirma pela pasta.
-                        string? path = null;
-                        try { path = p.MainModule?.FileName; } catch { }
-                        if (path is null) continue;
-                        foreach (var o in owners)
-                            if (path.StartsWith(o.Folder, StringComparison.OrdinalIgnoreCase))
-                                nowRunning.Add(o.Game);
+                        else if (owners.Count == 1 && !GenericNames.Contains(p.ProcessName))
+                        {
+                            // O Windows não deixou ler o caminho: confia no nome, se for único e não genérico.
+                            nowRunning.Add(owners[0].Game);
+                        }
                     }
                     catch { }
                     finally { p.Dispose(); }

@@ -20,10 +20,15 @@ public static class DataStore
         try
         {
             if (File.Exists(DataFile))
-                return JsonSerializer.Deserialize<UserData>(File.ReadAllText(DataFile), Json) ?? new UserData();
+            {
+                var data = JsonSerializer.Deserialize<UserData>(File.ReadAllText(DataFile), Json) ?? new UserData();
+                if (data.Settings.MigrateSecrets()) Save(data); // a chave deixa de ficar em texto simples
+                return data;
+            }
         }
-        catch
+        catch (Exception ex)
         {
+            AppLog.Error("dados.json estragado; foi guardada uma cópia e a app começou do zero", ex);
             // Ficheiro estragado: guarda uma cópia e começa do zero, em vez de a app não abrir.
             try { File.Copy(DataFile, DataFile + ".estragado", overwrite: true); } catch { }
         }

@@ -38,11 +38,14 @@ public partial class SettingsPage : UserControl, IPage
         KeyBox.Text = State.Data.Settings.SteamGridDbKey ?? "";
         KeyStatus.Text = Loc.T(string.IsNullOrWhiteSpace(KeyBox.Text) ? "Set_NoKey" : "Set_KeySet");
         FullscreenCheck.IsChecked = State.Data.Settings.StartFullscreen;
+        StartupCheck.IsChecked = WindowsStartup.IsEnabled;
+        TrayCheck.IsChecked = State.Data.Settings.CloseToTray;
+        AutoUpdateCheck.IsChecked = State.Data.Settings.CheckForUpdates;
         BuildLanguageChips();
         BuildColorChips();
         GameColorsCheck.IsChecked = State.Data.Settings.UseGameColors;
         var v = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
-        VersionText.Text = Loc.F("About_Version", v is null ? "?" : $"{v.Major}.{v.Minor}.{v.Build}");
+        VersionText.Text = Loc.F("About_Version", UpdateChecker.CurrentVersionText);
         AuthorText.Text = Loc.F("About_MadeBy", "diog0_h");
         BuildShortcuts();
         _ready = true;
@@ -354,6 +357,58 @@ public partial class SettingsPage : UserControl, IPage
         State.Save();
         MainWindow.Current.SetFullscreen(State.Data.Settings.StartFullscreen);
     }
+
+    // ------------------------------------------------------------ Windows / área de notificação
+
+    private void Startup_Changed(object sender, RoutedEventArgs e)
+    {
+        if (!_ready) return;
+        WindowsStartup.Set(StartupCheck.IsChecked == true);
+        StartupCheck.IsChecked = WindowsStartup.IsEnabled; // mostra o que ficou mesmo gravado
+    }
+
+    private void Tray_Changed(object sender, RoutedEventArgs e)
+    {
+        if (!_ready) return;
+        State.Data.Settings.CloseToTray = TrayCheck.IsChecked == true;
+        State.Save();
+    }
+
+    // ------------------------------------------------------------ atualizações
+
+    private void AutoUpdate_Changed(object sender, RoutedEventArgs e)
+    {
+        if (!_ready) return;
+        State.Data.Settings.CheckForUpdates = AutoUpdateCheck.IsChecked == true;
+        State.Save();
+    }
+
+    private async void CheckUpdate_Click(object sender, RoutedEventArgs e)
+    {
+        CheckUpdateButton.IsEnabled = false;
+        UpdateStatus.Visibility = Visibility.Visible;
+        UpdateStatus.Text = Loc.T("Upd_Checking");
+        try
+        {
+            var update = await UpdateChecker.CheckAsync();
+            if (update is null)
+                UpdateStatus.Text = Loc.F("Upd_UpToDate", UpdateChecker.CurrentVersionText);
+            else
+            {
+                UpdateStatus.Text = Loc.F("Upd_Version", update.Version.ToString(3), UpdateChecker.CurrentVersionText);
+                State.Data.Settings.DismissedUpdate = null;
+                MainWindow.Current.ShowUpdate(update);
+            }
+        }
+        catch (Exception ex)
+        {
+            AppLog.Info("Verificação de atualizações falhou: " + ex.Message);
+            UpdateStatus.Text = Loc.T("Upd_Failed");
+        }
+        finally { CheckUpdateButton.IsEnabled = true; }
+    }
+
+    private void OpenLogs_Click(object sender, RoutedEventArgs e) => AppLog.OpenFolder();
 
     private async void Reload_Click(object sender, RoutedEventArgs e)
     {

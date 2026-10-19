@@ -37,6 +37,8 @@ ArchitecturesInstallIn64BitMode=x64compatible
 MinVersion=10.0
 ; Fecha a app se estiver aberta durante uma atualização.
 CloseApplications=yes
+; A app usa este nome para só abrir uma vez; o instalador pede para a fechar (inclui a área de notificação).
+AppMutex=MyGameLauncher.diog0_h
 RestartApplications=no
 ShowLanguageDialog=auto
 
@@ -65,6 +67,10 @@ Source: "..\THIRD-PARTY-NOTICES.txt"; DestDir: "{app}"; Flags: ignoreversion
 [Icons]
 Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
+
+[Registry]
+; "Abrir com o Windows" é ligado dentro da app; ao desinstalar, apaga essa entrada.
+Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueName: "MyGameLauncher"; ValueType: none; Flags: uninsdeletevalue
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#MyAppName}}"; Flags: nowait postinstall skipifsilent

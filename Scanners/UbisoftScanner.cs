@@ -13,6 +13,9 @@ public sealed class UbisoftScanner
     public const string StoreName = "Ubisoft Connect";
     public List<string> Log { get; } = new();
 
+    /// <summary>Tamanhos já conhecidos (da última vez), para não voltar a somar a pasta inteira, que é lento.</summary>
+    public IReadOnlyDictionary<string, long>? KnownSizes { get; init; }
+
     public List<Game> Scan()
     {
         var games = new List<Game>();
@@ -41,7 +44,9 @@ public sealed class UbisoftScanner
                     Name = name,
                     Store = StoreName,
                     InstallPath = folder,
-                    SizeBytes = sizeKb > 0 ? sizeKb * 1024 : FolderSize(folder),
+                    SizeBytes = sizeKb > 0 ? sizeKb * 1024
+                        : KnownSizes?.GetValueOrDefault("uplay:" + id) is > 0 and var known ? known
+                        : FolderSize(folder),
                     LaunchUri = $"uplay://launch/{id}/0",
                     StoreDetailsUri = "uplay://",
                 });

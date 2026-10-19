@@ -4,7 +4,7 @@
              xmlns:local="clr-namespace:GameLauncher"
              xmlns:h="clr-namespace:GameLauncher.Helpers"
              xmlns:l="clr-namespace:GameLauncher.Localization"
-             StartupUri="MainWindow.xaml">
+             ShutdownMode="OnExplicitShutdown">
     <Application.Resources>
 
         <!-- ============ Conversores ============ -->

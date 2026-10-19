@@ -439,7 +439,52 @@ public sealed class Loc : INotifyPropertyChanged
 
         // ---------------- mensagens
         Add("Err_Title", "Erro", "Error", "Error", "Erreur", "Fehler");
-        Add("Err_Unexpected", "Erro inesperado", "Unexpected error", "Error inesperado", "Erreur inattendue", "Unerwarteter Fehler");
+        Add("Err_Friendly",
+            "Algo correu mal, mas a app continua a funcionar.\n\nOs detalhes ficaram guardados no ficheiro de registo. Se voltar a acontecer, podes enviar esse ficheiro ao criador da app.\n\nQueres abrir a pasta do registo?",
+            "Something went wrong, but the app is still running.\n\nThe details were saved to the log file. If it happens again, you can send that file to the app's creator.\n\nOpen the log folder?",
+            "Algo salió mal, pero la app sigue funcionando.\n\nLos detalles se guardaron en el archivo de registro. Si vuelve a pasar, puedes enviar ese archivo al creador de la app.\n\n¿Abrir la carpeta del registro?",
+            "Un problème est survenu, mais l’app fonctionne toujours.\n\nLes détails ont été enregistrés dans le fichier journal. Si cela se reproduit, tu peux envoyer ce fichier au créateur de l’app.\n\nOuvrir le dossier du journal ?",
+            "Etwas ist schiefgelaufen, aber die App läuft weiter.\n\nDie Details wurden in der Protokolldatei gespeichert. Wenn es wieder passiert, kannst du diese Datei an den Entwickler der App senden.\n\nProtokollordner öffnen?");
+
+        // ---------------- Windows / área de notificação
+        Add("Set_Windows", "Windows", "Windows", "Windows", "Windows", "Windows");
+        Add("Set_WindowsDesc",
+            "Com a app a correr em segundo plano, o tempo de jogo continua a ser contado mesmo quando abres os jogos diretamente na Steam ou na Epic.",
+            "With the app running in the background, playtime keeps being counted even when you open games straight from Steam or Epic.",
+            "Con la app en segundo plano, el tiempo de juego se sigue contando aunque abras los juegos directamente desde Steam o Epic.",
+            "Avec l’app en arrière-plan, le temps de jeu continue d’être compté même si tu lances les jeux directement depuis Steam ou Epic.",
+            "Läuft die App im Hintergrund, wird die Spielzeit weiter gezählt, auch wenn du Spiele direkt über Steam oder Epic startest.");
+        Add("Set_StartWithWindows", "Abrir com o Windows (na área de notificação)", "Start with Windows (in the notification area)",
+            "Abrir con Windows (en el área de notificación)", "Lancer avec Windows (dans la zone de notification)", "Mit Windows starten (im Infobereich)");
+        Add("Set_CloseToTray", "Ao fechar, continuar na área de notificação", "Keep running in the notification area when closed",
+            "Al cerrar, seguir en el área de notificación", "À la fermeture, rester dans la zone de notification", "Beim Schließen im Infobereich weiterlaufen");
+        Add("Tray_Open", "Abrir MyGameLauncher", "Open MyGameLauncher", "Abrir MyGameLauncher", "Ouvrir MyGameLauncher", "MyGameLauncher öffnen");
+        Add("Tray_Exit", "Sair", "Exit", "Salir", "Quitter", "Beenden");
+        Add("Tray_Hint",
+            "A app continua aqui, a contar o tempo de jogo. Para sair, usa o botão direito neste ícone.",
+            "The app is still here, counting your playtime. To quit, right-click this icon.",
+            "La app sigue aquí, contando el tiempo de juego. Para salir, haz clic derecho en este icono.",
+            "L’app est toujours là et compte ton temps de jeu. Pour quitter, fais un clic droit sur cette icône.",
+            "Die App läuft hier weiter und zählt deine Spielzeit. Zum Beenden mit der rechten Maustaste auf dieses Symbol klicken.");
+        Add("Set_OpenLogs", "Abrir pasta dos registos", "Open log folder", "Abrir carpeta de registros", "Ouvrir le dossier des journaux", "Protokollordner öffnen");
+
+        // ---------------- atualizações
+        Add("Upd_Available", "Versão nova", "New version", "Nueva versión", "Nouvelle version", "Neue Version");
+        Add("Upd_Version", "Disponível: {0} (tens a {1})", "Available: {0} (you have {1})", "Disponible: {0} (tienes la {1})",
+            "Disponible : {0} (tu as la {1})", "Verfügbar: {0} (du hast {1})");
+        Add("Upd_Download", "Ver e transferir", "View and download", "Ver y descargar", "Voir et télécharger", "Ansehen und herunterladen");
+        Add("Upd_Dismiss", "Não avisar desta versão", "Don't remind me about this version", "No avisar de esta versión",
+            "Ne plus me prévenir pour cette version", "Für diese Version nicht mehr erinnern");
+        Add("Upd_CheckNow", "Procurar atualizações", "Check for updates", "Buscar actualizaciones", "Rechercher des mises à jour", "Nach Updates suchen");
+        Add("Upd_Auto", "Procurar ao abrir a app", "Check when the app opens", "Buscar al abrir la app", "Vérifier à l’ouverture", "Beim Start prüfen");
+        Add("Upd_Checking", "A procurar…", "Checking…", "Buscando…", "Recherche…", "Wird geprüft …");
+        Add("Upd_UpToDate", "Tens a versão mais recente ({0}).", "You have the latest version ({0}).", "Tienes la versión más reciente ({0}).",
+            "Tu as la dernière version ({0}).", "Du hast die neueste Version ({0}).");
+        Add("Upd_Failed", "Não foi possível ver se há atualizações. Confirma a ligação à internet.",
+            "Couldn't check for updates. Check your internet connection.",
+            "No se pudo comprobar si hay actualizaciones. Revisa tu conexión a internet.",
+            "Impossible de vérifier les mises à jour. Vérifie ta connexion internet.",
+            "Updates konnten nicht geprüft werden. Prüfe deine Internetverbindung.");
         Add("Err_CannotOpen", "Não foi possível abrir {0}.", "Couldn't open {0}.", "No se pudo abrir {0}.", "Impossible d’ouvrir {0}.", "{0} konnte nicht geöffnet werden.");
         Add("Err_FolderNotFound", "A pasta deste jogo não foi encontrada.", "This game's folder wasn't found.",
             "No se encontró la carpeta de este juego.", "Le dossier de ce jeu est introuvable.", "Der Ordner dieses Spiels wurde nicht gefunden.");
@@ -469,6 +514,8 @@ public sealed class Loc : INotifyPropertyChanged
         Add("Log_PlaytimeError", "Erro a ler o tempo de jogo da Steam: {0}", "Error reading Steam playtime: {0}", "Error al leer el tiempo de juego de Steam: {0}", "Erreur de lecture du temps de jeu Steam : {0}", "Fehler beim Lesen der Steam-Spielzeit: {0}");
         Add("Log_EpicNotFound", "Epic Games: launcher não encontrado.", "Epic Games: launcher not found.", "Epic Games: no se encontró el launcher.", "Epic Games : launcher introuvable.", "Epic Games: Launcher nicht gefunden.");
         Add("Log_UbisoftNotFound", "Ubisoft Connect: launcher não encontrado.", "Ubisoft Connect: launcher not found.", "Ubisoft Connect: no se encontró el launcher.", "Ubisoft Connect : launcher introuvable.", "Ubisoft Connect: Launcher nicht gefunden.");
+        Add("Log_ScanTime", "Procura de jogos: {0} jogos em {1} ms", "Game scan: {0} games in {1} ms", "Búsqueda de juegos: {0} juegos en {1} ms",
+            "Recherche de jeux : {0} jeux en {1} ms", "Spielsuche: {0} Spiele in {1} ms");
         Add("Log_StoreGames", "{0}: {1} jogos", "{0}: {1} games", "{0}: {1} juegos", "{0} : {1} jeux", "{0}: {1} Spiele");
         Add("Log_EpicPlaytimeRead", "Epic Games: tempo de jogo lido da conta ({0} jogos).", "Epic Games: playtime read from account ({0} games).", "Epic Games: tiempo de juego leído de la cuenta ({0} juegos).", "Epic Games : temps de jeu lu depuis le compte ({0} jeux).", "Epic Games: Spielzeit aus dem Konto gelesen ({0} Spiele).");
         Add("Log_EpicPlaytimeFailed", "Epic Games: não foi possível ler o tempo de jogo da conta.", "Epic Games: couldn't read playtime from the account.", "Epic Games: no se pudo leer el tiempo de juego de la cuenta.", "Epic Games : impossible de lire le temps de jeu du compte.", "Epic Games: Spielzeit konnte nicht aus dem Konto gelesen werden.");

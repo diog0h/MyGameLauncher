@@ -44,8 +44,10 @@ public sealed class AppState
     {
         var steam = new SteamScanner();
         var epic = new EpicScanner();
-        var ubisoft = new UbisoftScanner();
+        var previous = Games.GroupBy(g => g.Id).ToDictionary(x => x.Key, x => x.First());
+        var ubisoft = new UbisoftScanner { KnownSizes = previous.Values.ToDictionary(g => g.Id, g => g.SizeBytes) };
         var custom = Data.CustomGames.ToList();
+        var clock = Stopwatch.StartNew();
 
         var games = await Task.Run(() =>
         {
@@ -58,8 +60,46 @@ public sealed class AppState
         });
         SteamRoot = steam.SteamRoot;
         Log = steam.Log.Concat(epic.Log).Concat(ubisoft.Log).ToList();
+        Log.Add(Loc.F("Log_ScanTime", games.Count, clock.ElapsedMilliseconds));
+        AppLog.Info($"Biblioteca: {games.Count} jogos encontrados em {clock.ElapsedMilliseconds} ms");
 
-        // Junta os dados guardados (favoritos, cores, sessões) a cada jogo.
+        // Mantém as imagens e o tempo da Epic que já estavam no ecrã, para nada piscar
+        // enquanto as imagens são confirmadas em segundo plano.
+        foreach (var g in games)
+        {
+            if (!previous.TryGetValue(g.Id, out var old)) continue;
+            g.CoverPath = old.CoverPath; g.HeroPath = old.HeroPath; g.LogoPath = old.LogoPath; g.HeaderPath = old.HeaderPath;
+            if (g.StorePlaytimeMinutes == 0) g.StorePlaytimeMinutes = old.StorePlaytimeMinutes;
+        }
+
+        ApplyUserData(games);
+        Games = games;
+        GamesLoaded?.Invoke();
+
+        _tracker.Start(games);
+        _ = LoadArtworkAsync(games);
+        _ = SyncEpicPlaytimeAsync();
+    }
+
+    /// <summary>
+    /// Mostra logo a lista guardada da última vez (biblioteca.json). Devolve false se não houver.
+    /// A procura a sério (<see cref="LoadAsync"/>) vem a seguir e substitui-a.
+    /// </summary>
+    public bool LoadSnapshot()
+    {
+        var clock = Stopwatch.StartNew();
+        var games = LibrarySnapshot.Load();
+        if (games.Count == 0) return false;
+        ApplyUserData(games);
+        Games = games;
+        GamesLoaded?.Invoke();
+        AppLog.Info($"Arranque: {games.Count} jogos mostrados da última vez em {clock.ElapsedMilliseconds} ms");
+        return true;
+    }
+
+    /// <summary>Junta os dados guardados (favoritos, cores, sessões) a cada jogo.</summary>
+    private void ApplyUserData(List<Game> games)
+    {
         var secondsById = Data.Sessions.GroupBy(s => s.GameId)
             .ToDictionary(g => g.Key, g => (Seconds: g.Sum(s => s.Seconds), Last: g.Max(s => s.End)));
 
@@ -74,13 +114,6 @@ public sealed class AppState
             }
             if (_openSessions.ContainsKey(g.Id)) g.IsRunning = true;
         }
-
-        Games = games;
-        GamesLoaded?.Invoke();
-
-        _tracker.Start(games);
-        _ = LoadArtworkAsync(games);
-        _ = SyncEpicPlaytimeAsync();
     }
 
     private static List<Game> Safe(Func<List<Game>> scan, List<string> log)
@@ -174,7 +207,12 @@ public sealed class AppState
             }).ContinueWith(_ => { });
 
         if (!cts.IsCancellationRequested)
-            await Application.Current.Dispatcher.InvokeAsync(Save);
+            await Application.Current.Dispatcher.InvokeAsync(() =>
+            {
+                Save();
+                var snapshot = Games.ToList();
+                _ = Task.Run(() => LibrarySnapshot.Save(snapshot));
+            });
     }
 
     private async Task LoadArtworkForAsync(ArtworkService art, Game g, CancellationToken ct)
@@ -236,8 +274,10 @@ public sealed class AppState
         Save();
 
         try { await LoadArtworkForAsync(new ArtworkService(SteamRoot, Data.Settings.SteamGridDbKey), g, CancellationToken.None); }
-        catch { }
+        catch (Exception ex) { AppLog.Error("Imagem personalizada", ex); }
         Save();
+        var snapshot = Games.ToList();
+        _ = Task.Run(() => LibrarySnapshot.Save(snapshot));
         LibraryChanged?.Invoke();
     }
 

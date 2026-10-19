@@ -164,6 +164,20 @@
                 </StackPanel>
             </Border>
 
+            <!-- Windows: arranque e área de notificação -->
+            <Border Style="{StaticResource Card}">
+                <StackPanel>
+                    <TextBlock Text="{l:Tr Set_Windows}" Style="{StaticResource CardTitle}"/>
+                    <TextBlock Text="{l:Tr Set_WindowsDesc}" Style="{StaticResource CardText}"/>
+                    <WrapPanel>
+                        <CheckBox x:Name="StartupCheck" Style="{StaticResource ChipToggle}" Margin="0,0,10,8"
+                                  Content="{l:Tr Set_StartWithWindows}" Checked="Startup_Changed" Unchecked="Startup_Changed"/>
+                        <CheckBox x:Name="TrayCheck" Style="{StaticResource ChipToggle}" Margin="0,0,10,8"
+                                  Content="{l:Tr Set_CloseToTray}" Checked="Tray_Changed" Unchecked="Tray_Changed"/>
+                    </WrapPanel>
+                </StackPanel>
+            </Border>
+
             <!-- Teclado e comando -->
             <Border Style="{StaticResource Card}">
                 <StackPanel>
@@ -187,6 +201,8 @@
                     <DockPanel>
                         <Button DockPanel.Dock="Right" Style="{StaticResource GlassButton}" Content="{l:Tr Set_Reload}"
                                 Click="Reload_Click"/>
+                        <Button DockPanel.Dock="Right" Style="{StaticResource GlassButton}" Margin="0,0,10,0"
+                                Content="{l:Tr Set_OpenLogs}" Click="OpenLogs_Click"/>
                         <TextBlock Text="{l:Tr Set_Diagnostics}" Style="{StaticResource CardTitle}" VerticalAlignment="Center"/>
                     </DockPanel>
                     <TextBox x:Name="LogBox" IsReadOnly="True" TextWrapping="Wrap" Margin="0,12,0,0" Padding="12"
@@ -206,6 +222,19 @@
                             <TextBlock x:Name="AuthorText" Foreground="{StaticResource SubtleTextBrush}"/>
                         </StackPanel>
                     </StackPanel>
+
+                    <!-- Atualizações -->
+                    <WrapPanel Margin="0,0,0,6">
+                        <Button x:Name="CheckUpdateButton" Style="{StaticResource GlassButton}" Margin="0,0,10,8" Click="CheckUpdate_Click">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE895;" Style="{StaticResource Icon}" Margin="0,0,8,0"/>
+                                <TextBlock Text="{l:Tr Upd_CheckNow}"/>
+                            </StackPanel>
+                        </Button>
+                        <CheckBox x:Name="AutoUpdateCheck" Style="{StaticResource ChipToggle}" Margin="0,0,10,8"
+                                  Content="{l:Tr Upd_Auto}" Checked="AutoUpdate_Changed" Unchecked="AutoUpdate_Changed"/>
+                    </WrapPanel>
+                    <TextBlock x:Name="UpdateStatus" Style="{StaticResource CardText}" Visibility="Collapsed"/>
 
                     <TextBlock Text="{l:Tr About_Credits}" Style="{StaticResource CardTitle}" FontSize="15" Margin="0,4,0,8"/>
                     <StackPanel x:Name="CreditsPanel" TextElement.Foreground="{StaticResource TextBrush}">

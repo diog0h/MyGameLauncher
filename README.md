@@ -26,6 +26,8 @@
 - **Favorites, collections, search, sorting and store filters.**
 - **Controller support** — Xbox and PlayStation (DualShock 4 / DualSense, USB or Bluetooth, no extra software), with a Big Picture-style hint bar that shows the right button icons.
 - **Full screen mode** for the TV (F11 or the Menu/Options button).
+- **Runs quietly in the background** (optional) — start with Windows and keep running in the notification area, so playtime is counted even when you launch games straight from Steam or Epic.
+- **Update notice** when a new version is published here, and a log file to help track down problems.
 - **5 languages** — English, Português, Español, Français, Deutsch (uses your Windows language when available).
 
 ## Screenshots

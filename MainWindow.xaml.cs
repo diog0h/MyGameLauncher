@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Automation.Peers;
 using System.Windows.Automation.Provider;
@@ -66,7 +67,24 @@ public partial class MainWindow : Window
             NativeMethods.SetCaptionColor(this, DefaultAccent);
         };
         Loaded += async (_, _) => await StartAsync();
-        Closing += (_, _) => { SaveWindowPlacement(); _gamepad.Dispose(); State.Shutdown(); };
+        Closing += (_, e) =>
+        {
+            // Com a opção ligada, fechar só esconde a janela: a app continua a contar o tempo de jogo.
+            if (!_exiting && State.Data.Settings.CloseToTray)
+            {
+                e.Cancel = true;
+                HideToTray();
+                return;
+            }
+            SaveWindowPlacement();
+            _gamepad.Dispose();
+            State.Shutdown();
+        };
+        Closed += (_, _) =>
+        {
+            _tray?.Dispose();
+            Application.Current.Shutdown();
+        };
 
         PreviewKeyDown += OnPreviewKeyDown;
         PreviewMouseMove += (_, e) =>
@@ -89,11 +107,102 @@ public partial class MainWindow : Window
         Loc.Changed += OnLanguageChanged;
     }
 
+    private bool _started;
+
     private async Task StartAsync()
     {
+        if (_started) return;
+        _started = true;
         if (State.Data.Settings.StartFullscreen) SetFullscreen(true);
+
+        // 1) Mostra logo a biblioteca da última vez; 2) procura jogos novos em segundo plano.
+        bool fromSnapshot = State.LoadSnapshot();
+        if (fromSnapshot) Navigate(new HomePage(), NavHome, addToHistory: false);
         await State.LoadAsync();
-        Navigate(new HomePage(), NavHome, addToHistory: false);
+        if (!fromSnapshot) Navigate(new HomePage(), NavHome, addToHistory: false);
+
+        _ = CheckForUpdatesAsync();
+    }
+
+    // ============================================================ área de notificação
+
+    private TrayIcon? _tray;
+    private bool _exiting;
+
+    private TrayIcon Tray => _tray ??= new TrayIcon(ShowFromTray, ExitApp);
+
+    /// <summary>Arranque com o Windows: carrega tudo mas fica só na área de notificação.</summary>
+    public void StartInTray()
+    {
+        Tray.Visible = true;
+        _ = StartAsync();
+    }
+
+    public void ShowFromTray()
+    {
+        if (!IsVisible) Show();
+        if (WindowState == WindowState.Minimized) WindowState = _isFullscreen ? WindowState.Maximized : WindowState.Normal;
+        Activate();
+        Topmost = true; Topmost = false; // traz mesmo para a frente
+        if (_tray is not null) _tray.Visible = false;
+    }
+
+    private void HideToTray()
+    {
+        SaveWindowPlacement();
+        State.Save();
+        Hide();
+        Tray.Visible = true;
+        if (!State.Data.Settings.TrayHintShown)
+        {
+            State.Data.Settings.TrayHintShown = true;
+            State.Save();
+            Tray.Notify(Loc.T("Tray_Hint"));
+        }
+    }
+
+    /// <summary>Fecha mesmo a app (menu da área de notificação).</summary>
+    public void ExitApp()
+    {
+        _exiting = true;
+        Close();
+    }
+
+    // ============================================================ atualizações
+
+    private UpdateChecker.Update? _update;
+
+    private async Task CheckForUpdatesAsync()
+    {
+        if (!State.Data.Settings.CheckForUpdates) return;
+        await Task.Delay(TimeSpan.FromSeconds(4)); // não atrasa o arranque
+        try
+        {
+            var update = await UpdateChecker.CheckAsync();
+            if (update is null || update.Tag == State.Data.Settings.DismissedUpdate) return;
+            ShowUpdate(update);
+        }
+        catch (Exception ex) { AppLog.Info("Não foi possível ver se há atualizações: " + ex.Message); }
+    }
+
+    public void ShowUpdate(UpdateChecker.Update update)
+    {
+        _update = update;
+        UpdateVersionText.Text = Loc.F("Upd_Version", update.Version.ToString(3), UpdateChecker.CurrentVersionText);
+        UpdateBanner.Visibility = Visibility.Visible;
+    }
+
+    private void OpenUpdate_Click(object sender, RoutedEventArgs e)
+    {
+        try { Process.Start(new ProcessStartInfo(_update?.Url ?? UpdateChecker.ReleasesUrl) { UseShellExecute = true }); }
+        catch { }
+    }
+
+    private void DismissUpdate_Click(object sender, RoutedEventArgs e)
+    {
+        if (_update is not null) State.Data.Settings.DismissedUpdate = _update.Tag;
+        State.Save();
+        UpdateBanner.Visibility = Visibility.Collapsed;
     }
 
     // ============================================================ navegação

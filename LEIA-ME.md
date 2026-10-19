@@ -27,6 +27,10 @@ dotnet publish -c Release -o .
   Também podes escolher as tuas (capa, plano de fundo, logótipo e capa ampla) ao adicionar um jogo ou em
   **Personalizar**, na página de cada jogo.
   Ficam guardadas no PC.
+- **Segundo plano** (opcional, em Definições → Windows): abrir com o Windows e continuar na área de notificação ao
+  fechar, para contar o tempo de jogo mesmo quando abres os jogos pela Steam ou pela Epic.
+- **Atualizações**: avisa quando há uma versão nova no GitHub. Os erros ficam em
+  `%LocalAppData%\GameLauncher\logs` (Definições → Diagnóstico → Abrir pasta dos registos).
 - **Comando e teclado**: comandos Xbox e PlayStation (DualShock 4 e DualSense, por cabo ou Bluetooth).
   Ver a tabela em Definições. F11 = ecrã inteiro.
 - **Idioma**: Português, English, Español, Français, Deutsch (Definições → Idioma). Na primeira vez usa a
