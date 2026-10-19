@@ -99,6 +99,8 @@ public partial class MainWindow : Window
         foreach (var rb in AllNavItems()) rb.IsChecked = rb == nav;
 
         PageTitle.Text = page is IPage p ? p.Title : "";
+        // Só o Início e a página do jogo têm cor própria (definem-na ao abrir); as outras voltam à cor original.
+        if (page is not HomePage and not GamePage) SetAccent(null);
         SetTopBarSolid(false);
         // Ao voltar atrás a página pode estar a meio: verifica depois de ser desenhada.
         Dispatcher.BeginInvoke(() =>
