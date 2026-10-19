@@ -6,6 +6,14 @@
 
 <p align="center">One library for all your PC games — Steam, Epic Games, Ubisoft Connect and anything else.</p>
 
+<p align="center">
+  <a href="../../releases/latest"><b>⬇ Download the latest version</b></a>
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/home.png" alt="MyGameLauncher home screen" width="900">
+</p>
+
 ---
 
 ## Features
@@ -18,6 +26,19 @@
 - **Controller support** — Xbox and PlayStation (DualShock 4 / DualSense, USB or Bluetooth, no extra software), with a Big Picture-style hint bar that shows the right button icons.
 - **Full screen mode** for the TV (F11 or the Menu/Options button).
 - **5 languages** — English, Português, Español, Français, Deutsch (uses your Windows language when available).
+
+## Screenshots
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/game.png" alt="Game page"><p align="center"><sub>Game page — the colors follow the game</sub></p></td>
+    <td width="50%"><img src="docs/screenshots/library.png" alt="All games"><p align="center"><sub>Your whole library, from every store</sub></p></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/playtime.png" alt="Playtime"><p align="center"><sub>Playtime from Steam and Epic</sub></p></td>
+    <td width="50%"><img src="docs/screenshots/home.png" alt="Home"><p align="center"><sub>Console-style home screen</sub></p></td>
+  </tr>
+</table>
 
 ## Download
 
