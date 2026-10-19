@@ -19,6 +19,9 @@ public static class PlayStationReport
     public static readonly HashSet<int> DualShock4Ids = new() { 0x05C4, 0x09CC, 0x0BA0 };
     public static readonly HashSet<int> DualSenseIds = new() { 0x0CE6, 0x0DF2 };
 
+    /// <summary>Por cabo, DualShock 4 e DualSense têm relatórios de 64 bytes; por Bluetooth são maiores.</summary>
+    public const int UsbReportLength = 64;
+
     public static bool IsSupported(int productId) =>
         DualShock4Ids.Contains(productId) || DualSenseIds.Contains(productId);
 
@@ -27,11 +30,13 @@ public static class PlayStationReport
     /// Formatos:
     ///  DS4 USB / Bluetooth simples (0x01): sticks em 1-4, botões em 5-7.
     ///  DS4 Bluetooth completo (0x11): igual ao USB mas 2 bytes mais à frente.
-    ///  DualSense USB (0x01, 64 bytes): sticks em 1-4, botões em 8-10.
+    ///  DualSense USB (0x01): sticks em 1-4, botões em 8-10.
     ///  DualSense Bluetooth completo (0x31): igual ao USB mas 1 byte mais à frente.
-    ///  DualSense Bluetooth simples (0x01, curto): sticks em 1-4, botões em 5-7.
+    ///  DualSense Bluetooth simples (0x01): sticks em 1-4, botões em 5-7.
+    /// Atenção: no Windows os relatórios chegam sempre com o tamanho máximo do comando (o resto vem a zeros),
+    /// por isso USB e Bluetooth distinguem-se pela ligação (<paramref name="bluetooth"/>), não pelo tamanho lido.
     /// </summary>
-    public static ushort? Parse(byte[] r, int length, bool dualSense)
+    public static ushort? Parse(byte[] r, int length, bool dualSense, bool bluetooth)
     {
         if (length < 8) return null;
         int sticks, buttons;
@@ -39,8 +44,8 @@ public static class PlayStationReport
         {
             case 0x01 when !dualSense: sticks = 1; buttons = 5; break;
             case 0x11 when !dualSense: sticks = 3; buttons = 7; break;
-            case 0x01 when dualSense && length >= 32: sticks = 1; buttons = 8; break;
-            case 0x01 when dualSense: sticks = 1; buttons = 5; break;
+            case 0x01 when dualSense && !bluetooth: sticks = 1; buttons = 8; break;
+            case 0x01 when dualSense && bluetooth: sticks = 1; buttons = 5; break;
             case 0x31 when dualSense: sticks = 2; buttons = 9; break;
             default: return null;
         }

@@ -531,8 +531,7 @@ public partial class MainWindow : Window
                 _ = ReloadAsync(); e.Handled = true; return;
             case Key.Escape:
                 if (inText) { FocusContent(); e.Handled = true; return; }
-                if (_history.Count > 0) GoBack();
-                else if (_isFullscreen) SetFullscreen(false);
+                GoBack(); // como o ○/B do comando (a Steam traduz o ○ em Esc): o ecrã inteiro é com F11
                 e.Handled = true; return;
             case Key.Back when !inText:
                 GoBack(); e.Handled = true; return;
@@ -595,7 +594,7 @@ public partial class MainWindow : Window
             case PadButton.Right: MoveFocus(FocusNavigationDirection.Right); break;
             case PadButton.A: ActivateFocused(); break;
             case PadButton.B:
-                if (_history.Count > 0) GoBack(); else if (_isFullscreen) SetFullscreen(false);
+                GoBack(); // só volta atrás; o ecrã inteiro liga/desliga com Menu/Options
                 break;
             case PadButton.X:
                 if (TargetGame() is { } toPlay) State.Play(toPlay);

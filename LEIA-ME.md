@@ -35,7 +35,7 @@ dotnet publish -c Release -o .
 
 1. Instala o Inno Setup 6 (gratuito): https://jrsoftware.org/isdl.php
 2. Duplo clique em **criar-instalador.bat**.
-3. O instalador fica em `installer\Output\MyGameLauncher-Setup-1.0.1.exe`.
+3. O instalador fica em `installer\Output\MyGameLauncher-Setup-1.0.2.exe`.
 
 O instalador leva o .NET incluído (funciona em qualquer PC com Windows 10/11), cria atalhos no Menu Iniciar
 (e no Ambiente de Trabalho, se escolhido), aparece em Definições → Aplicações para desinstalar e, ao desinstalar,

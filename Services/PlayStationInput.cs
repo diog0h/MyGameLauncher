@@ -51,9 +51,10 @@ public sealed class PlayStationInput : IDisposable
 
                 if (!dev.TryOpen(out HidStream stream)) continue;
                 _state[key] = 0;
-                _names[key] = PlayStationReport.DualSenseIds.Contains(dev.ProductID) ? "DualSense" : "DualShock 4";
-
-                var thread = new Thread(() => ReadLoop(key, stream, len, PlayStationReport.DualSenseIds.Contains(dev.ProductID)))
+                bool dualSense = PlayStationReport.DualSenseIds.Contains(dev.ProductID);
+                bool bluetooth = len != PlayStationReport.UsbReportLength;
+                _names[key] = (dualSense ? "DualSense" : "DualShock 4") + (bluetooth ? " (Bluetooth)" : " (USB)");
+                var thread = new Thread(() => ReadLoop(key, stream, len, dualSense, bluetooth))
                 {
                     IsBackground = true,
                     Name = "PlayStation pad",
@@ -64,7 +65,7 @@ public sealed class PlayStationInput : IDisposable
         catch { /* sem permissões ou HID indisponível: ignora */ }
     }
 
-    private void ReadLoop(string key, HidStream stream, int length, bool dualSense)
+    private void ReadLoop(string key, HidStream stream, int length, bool dualSense, bool bluetooth)
     {
         var buf = new byte[length];
         try
@@ -77,7 +78,7 @@ public sealed class PlayStationInput : IDisposable
                 catch (TimeoutException) { continue; }
 
                 if (n <= 0) continue;
-                if (PlayStationReport.Parse(buf, n, dualSense) is { } mask) _state[key] = mask;
+                if (PlayStationReport.Parse(buf, n, dualSense, bluetooth) is { } mask) _state[key] = mask;
             }
         }
         catch { /* comando desligado */ }
