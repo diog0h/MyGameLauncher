@@ -110,6 +110,57 @@ public sealed class Loc : INotifyPropertyChanged
             "Elige un archivo que exista (o escribe un enlace, p. ej. battlenet://).",
             "Choisis un fichier existant (ou saisis un lien, ex. battlenet://).",
             "Wähle eine vorhandene Datei (oder gib einen Link ein, z. B. battlenet://).");
+        // Imagens escolhidas à mão
+        Add("Art_Customize", "Personalizar", "Customize", "Personalizar", "Personnaliser", "Anpassen");
+        Add("Art_PageTitle", "Personalizar", "Customize", "Personalizar", "Personnaliser", "Anpassen");
+        Add("Art_PageDesc",
+            "Escolhe as tuas próprias imagens para este jogo. \"Repor\" volta à imagem encontrada automaticamente.",
+            "Pick your own images for this game. \"Reset\" goes back to the one found automatically.",
+            "Elige tus propias imágenes para este juego. \"Restablecer\" vuelve a la imagen encontrada automáticamente.",
+            "Choisis tes propres images pour ce jeu. « Réinitialiser » revient à l’image trouvée automatiquement.",
+            "Wähle eigene Bilder für dieses Spiel. „Zurücksetzen“ stellt das automatisch gefundene Bild wieder her.");
+        Add("Art_Images", "Imagens", "Images", "Imágenes", "Images", "Bilder");
+        Add("Art_AddDesc",
+            "Opcional. O que não escolheres, a app tenta encontrar sozinha. Podes mudar tudo mais tarde em \"Personalizar\", na página do jogo.",
+            "Optional. Anything you don't pick, the app tries to find on its own. You can change everything later with \"Customize\" on the game's page.",
+            "Opcional. Lo que no elijas, la app intenta encontrarlo sola. Puedes cambiarlo todo más tarde en \"Personalizar\", en la página del juego.",
+            "Facultatif. Ce que tu ne choisis pas, l’app essaie de le trouver toute seule. Tu peux tout changer plus tard avec « Personnaliser » sur la page du jeu.",
+            "Optional. Was du nicht auswählst, versucht die App selbst zu finden. Du kannst später alles über „Anpassen“ auf der Spielseite ändern.");
+        Add("Art_Cover", "Capa", "Cover", "Portada", "Jaquette", "Cover");
+        Add("Art_CoverDesc", "Aparece nas filas e grelhas de jogos. Tamanho ideal: 600 × 900 píxeis.",
+            "Shown in game rows and grids. Ideal size: 600 × 900 pixels.",
+            "Aparece en las filas y cuadrículas de juegos. Tamaño ideal: 600 × 900 píxeles.",
+            "Affichée dans les rangées et grilles de jeux. Taille idéale : 600 × 900 pixels.",
+            "Erscheint in Spielreihen und -rastern. Ideale Größe: 600 × 900 Pixel.");
+        Add("Art_Hero", "Plano de fundo", "Background", "Fondo", "Arrière-plan", "Hintergrund");
+        Add("Art_HeroDesc", "Aparece no topo da página do jogo e no destaque do Início. Tamanho ideal: 3840 × 1240 píxeis.",
+            "Shown at the top of the game page and in the Home spotlight. Ideal size: 3840 × 1240 pixels.",
+            "Aparece en la parte superior de la página del juego y en el destacado de Inicio. Tamaño ideal: 3840 × 1240 píxeles.",
+            "Affiché en haut de la page du jeu et dans la mise en avant de l’Accueil. Taille idéale : 3840 × 1240 pixels.",
+            "Erscheint oben auf der Spielseite und im Highlight der Startseite. Ideale Größe: 3840 × 1240 Pixel.");
+        Add("Art_Logo", "Logótipo", "Logo", "Logotipo", "Logo", "Logo");
+        Add("Art_LogoDesc", "Aparece por cima do plano de fundo. Usa um PNG com fundo transparente. Tamanho ideal: 1280 píxeis de largura ou 720 de altura.",
+            "Shown over the background. Use a PNG with a transparent background. Ideal size: 1280 pixels wide or 720 pixels tall.",
+            "Aparece sobre el fondo. Usa un PNG con fondo transparente. Tamaño ideal: 1280 píxeles de ancho o 720 de alto.",
+            "Affiché par-dessus l’arrière-plan. Utilise un PNG à fond transparent. Taille idéale : 1280 pixels de large ou 720 de haut.",
+            "Erscheint über dem Hintergrund. Verwende ein PNG mit transparentem Hintergrund. Ideale Größe: 1280 Pixel breit oder 720 Pixel hoch.");
+        Add("Art_Header", "Capa ampla", "Wide cover", "Portada ancha", "Jaquette large", "Breites Cover");
+        Add("Art_HeaderDesc", "Usada no lugar do plano de fundo quando este falta. Tamanho ideal: 920 × 430 píxeis.",
+            "Used instead of the background when there isn't one. Ideal size: 920 × 430 pixels.",
+            "Se usa en lugar del fondo cuando falta. Tamaño ideal: 920 × 430 píxeles.",
+            "Utilisée à la place de l’arrière-plan quand il manque. Taille idéale : 920 × 430 pixels.",
+            "Wird statt des Hintergrunds verwendet, wenn keiner vorhanden ist. Ideale Größe: 920 × 430 Pixel.");
+        Add("Art_Change", "Mudar", "Change", "Cambiar", "Changer", "Ändern");
+        Add("Art_Reset", "Repor", "Reset", "Restablecer", "Réinitialiser", "Zurücksetzen");
+        Add("Art_Custom", "Escolhida por ti", "Your pick", "Elegida por ti", "Choisie par toi", "Von dir gewählt");
+        Add("Art_None", "Sem imagem", "No image", "Sin imagen", "Aucune image", "Kein Bild");
+        Add("Art_Auto", "Automática", "Automatic", "Automática", "Automatique", "Automatisch");
+        Add("Art_FileFilter", "Imagens", "Images", "Imágenes", "Images", "Bilder");
+        Add("Art_ErrImage", "Não foi possível abrir essa imagem. Experimenta um ficheiro PNG ou JPG.",
+            "Couldn't open that image. Try a PNG or JPG file.",
+            "No se pudo abrir esa imagen. Prueba con un archivo PNG o JPG.",
+            "Impossible d’ouvrir cette image. Essaie un fichier PNG ou JPG.",
+            "Dieses Bild konnte nicht geöffnet werden. Versuch es mit einer PNG- oder JPG-Datei.");
         Add("Add_ErrName", "Escreve o nome do jogo.", "Type the game name.", "Escribe el nombre del juego.", "Saisis le nom du jeu.", "Gib den Namen des Spiels ein.");
 
         // ---------------- barra de ajuda do comando
@@ -325,8 +376,16 @@ public sealed class Loc : INotifyPropertyChanged
             "{0} jeux sur {1} ont une jaquette. Cache de l’app : {2:0.0} Mo (les images déjà dans le cache de Steam ne sont pas copiées).",
             "{0} von {1} Spielen haben ein Cover. App-Cache: {2:0.0} MB (Bilder aus dem Steam-Cache werden nicht kopiert).");
         Add("Set_Searching", "A procurar imagens em falta…", "Looking for missing images…", "Buscando imágenes que faltan…", "Recherche des images manquantes…", "Fehlende Bilder werden gesucht…");
-        Add("Set_CacheCleared", "Cache limpa. A descarregar imagens e recalcular cores…", "Cache cleared. Downloading images and recalculating colors…",
-            "Caché vaciada. Descargando imágenes y recalculando colores…", "Cache vidé. Téléchargement des images et recalcul des couleurs…", "Cache geleert. Bilder werden geladen und Farben neu berechnet…");
+        Add("Set_SearchingProgress", "A procurar imagens… {0} de {1} jogos", "Looking for images… {0} of {1} games",
+            "Buscando imágenes… {0} de {1} juegos", "Recherche des images… {0} jeux sur {1}", "Bilder werden gesucht … {0} von {1} Spielen");
+        Add("Set_FoundImages", "Encontradas {0} imagens novas.", "Found {0} new images.", "Se encontraron {0} imágenes nuevas.",
+            "{0} nouvelles images trouvées.", "{0} neue Bilder gefunden.");
+        Add("Set_NoNewImages",
+            "Não foram encontradas imagens novas. Podes escolher as tuas em \"Personalizar\", na página de cada jogo.",
+            "No new images found. You can pick your own with \"Customize\" on each game's page.",
+            "No se encontraron imágenes nuevas. Puedes elegir las tuyas en \"Personalizar\", en la página de cada juego.",
+            "Aucune nouvelle image trouvée. Tu peux choisir les tiennes avec « Personnaliser » sur la page de chaque jeu.",
+            "Keine neuen Bilder gefunden. Du kannst eigene über „Anpassen“ auf der Seite jedes Spiels wählen.");
         Add("Set_Screen", "Ecrã", "Display", "Pantalla", "Affichage", "Anzeige");
         Add("Set_ScreenDesc", "Útil para usar na TV ou só com o comando.", "Handy on a TV or when using only a controller.",
             "Útil en la TV o usando solo el mando.", "Pratique sur une TV ou avec une manette uniquement.", "Praktisch am Fernseher oder nur mit Controller.");

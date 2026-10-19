@@ -97,6 +97,12 @@
                                 <TextBlock Text="{Binding Store}"/>
                             </StackPanel>
                         </Button>
+                        <Button Style="{StaticResource GlassButton}" Margin="10,0,0,0" Click="Customize_Click">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE70F;" Style="{StaticResource Icon}" Margin="0,0,8,0"/>
+                                <TextBlock Text="{l:Tr Art_Customize}"/>
+                            </StackPanel>
+                        </Button>
                         <Button Style="{StaticResource GlassButton}" Margin="10,0,0,0" Click="Remove_Click"
                                 Visibility="{Binding IsCustom, Converter={StaticResource BoolToVis}}">
                             <StackPanel Orientation="Horizontal">

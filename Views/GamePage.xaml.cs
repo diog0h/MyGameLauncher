@@ -48,6 +48,9 @@ public partial class GamePage : UserControl, IPage
         if (e.PropertyName == nameof(Game.Accent)) MainWindow.Current.SetAccent(_game.Accent);
     }
 
+    private void Customize_Click(object sender, RoutedEventArgs e) =>
+        MainWindow.Current.Navigate(new ArtworkPage(_game));
+
     // ------------------------------------------------------------ remover (jogos adicionados à mão)
 
     private async void Remove_Click(object sender, RoutedEventArgs e)

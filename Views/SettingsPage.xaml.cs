@@ -304,23 +304,48 @@ public partial class SettingsPage : UserControl, IPage
         State.Data.Settings.SteamGridDbKey = key.Length == 0 ? null : key;
         State.Save();
         KeyStatus.Text = Loc.T(key.Length == 0 ? "Set_KeyRemoved" : "Set_KeySaved");
-        State.ReloadArtwork(retryMissing: true);
+        _ = SearchArtworkAsync();
     }
 
-    private void RetryArt_Click(object sender, RoutedEventArgs e)
-    {
-        State.ReloadArtwork(retryMissing: true);
-        CacheText.Text = Loc.T("Set_Searching");
-    }
+    private void RetryArt_Click(object sender, RoutedEventArgs e) => _ = SearchArtworkAsync();
 
     private void ClearCache_Click(object sender, RoutedEventArgs e)
     {
         ArtworkService.ClearCache();
         State.Data.Colors.Clear();
         foreach (var g in State.Games) g.Accent = null;
-        State.ReloadArtwork(retryMissing: true);
-        CacheText.Text = Loc.T("Set_CacheCleared");
+        _ = SearchArtworkAsync();
     }
+
+    private bool _searching;
+
+    /// <summary>Procura as imagens em falta mostrando o progresso, e no fim diz quantas encontrou.</summary>
+    private async Task SearchArtworkAsync()
+    {
+        if (_searching) return;
+        _searching = true;
+        RetryArtButton.IsEnabled = ClearCacheButton.IsEnabled = false;
+        int before = CountImages();
+        CacheText.Text = Loc.T("Set_Searching");
+        var progress = new Progress<(int Done, int Total)>(p =>
+            CacheText.Text = Loc.F("Set_SearchingProgress", p.Done, p.Total));
+        try
+        {
+            await State.ReloadArtworkAsync(retryMissing: true, progress);
+        }
+        finally
+        {
+            _searching = false;
+            RetryArtButton.IsEnabled = ClearCacheButton.IsEnabled = true;
+            RefreshInfo();
+            int found = CountImages() - before;
+            var result = found > 0 ? Loc.F("Set_FoundImages", found) : Loc.T("Set_NoNewImages");
+            CacheText.Text = result + " " + CacheText.Text;
+        }
+    }
+
+    private int CountImages() =>
+        State.Games.Sum(g => (g.CoverPath is null ? 0 : 1) + (g.HeroPath is null ? 0 : 1) + (g.LogoPath is null ? 0 : 1));
 
     private void Fullscreen_Changed(object sender, RoutedEventArgs e)
     {

@@ -106,7 +106,7 @@ public partial class AddGamePage : UserControl, IPage
             Store = store,
             Path = path,
             Arguments = string.IsNullOrWhiteSpace(ArgsBox.Text) ? null : ArgsBox.Text.Trim(),
-        });
+        }, ArtEditor.Pending);
         if (game is not null) MainWindow.Current.Navigate(new GamePage(game), null, addToHistory: false);
     }
 

@@ -3,7 +3,7 @@
 ; (Esse ficheiro prepara a app em "publish-instalador" e depois compila este script.)
 
 #define MyAppName "MyGameLauncher"
-#define MyAppVersion "1.0.2"
+#define MyAppVersion "1.1.0"
 #define MyAppPublisher "diog0_h"
 #define MyAppExeName "MyGameLauncher.exe"
 #define SourceDir "..\publish-instalador"

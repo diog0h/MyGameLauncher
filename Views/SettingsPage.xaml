@@ -147,8 +147,8 @@
                     <TextBlock Text="{l:Tr Set_Images}" Style="{StaticResource CardTitle}"/>
                     <TextBlock x:Name="CacheText" Style="{StaticResource CardText}"/>
                     <StackPanel Orientation="Horizontal">
-                        <Button Style="{StaticResource GlassButton}" Content="{l:Tr Set_RetryArt}" Click="RetryArt_Click"/>
-                        <Button Style="{StaticResource GlassButton}" Margin="10,0,0,0" Content="{l:Tr Set_ClearCache}"
+                        <Button x:Name="RetryArtButton" Style="{StaticResource GlassButton}" Content="{l:Tr Set_RetryArt}" Click="RetryArt_Click"/>
+                        <Button x:Name="ClearCacheButton" Style="{StaticResource GlassButton}" Margin="10,0,0,0" Content="{l:Tr Set_ClearCache}"
                                 Click="ClearCache_Click"/>
                     </StackPanel>
                 </StackPanel>

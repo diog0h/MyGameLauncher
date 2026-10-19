@@ -22,6 +22,7 @@
 - **Console-style home screen** — a big "Continue playing" banner, rows for recent games, favorites and your collections.
 - **Colors that follow the game** — the whole app takes the color of the featured game's cover.
 - **Playtime** — total hours read from Steam (and from Epic, if you choose to connect your account), plus a 7-day chart and a most-played ranking.
+- **Your own artwork** — pick the cover, background, logo and wide cover for any game (when adding it, or later with **Customize** on its page).
 - **Favorites, collections, search, sorting and store filters.**
 - **Controller support** — Xbox and PlayStation (DualShock 4 / DualSense, USB or Bluetooth, no extra software), with a Big Picture-style hint bar that shows the right button icons.
 - **Full screen mode** for the TV (F11 or the Menu/Options button).

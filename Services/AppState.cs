@@ -125,9 +125,18 @@ public sealed class AppState
         }
     }
 
-    public async Task<Game?> AddCustomGameAsync(CustomGame c)
+    public async Task<Game?> AddCustomGameAsync(CustomGame c, IReadOnlyDictionary<ArtKind, string>? art = null)
     {
         Data.CustomGames.Add(c);
+        if (art is { Count: > 0 })
+        {
+            var custom = new CustomArtwork();
+            foreach (var (kind, file) in art)
+            {
+                try { CustomArtStore.Set(custom, kind, CustomArtStore.Import(file, c.Id, kind)); } catch { }
+            }
+            if (!custom.IsEmpty) Data.CustomArt[c.Id] = custom;
+        }
         Save();
         await LoadAsync();
         return FindGame(c.Id);
@@ -137,12 +146,14 @@ public sealed class AppState
     {
         Data.CustomGames.RemoveAll(c => c.Id == game.Id);
         Data.Favorites.Remove(game.Id);
+        if (Data.CustomArt.Remove(game.Id, out var art))
+            foreach (var kind in Enum.GetValues<ArtKind>()) CustomArtStore.Delete(CustomArtStore.Get(art, kind));
         foreach (var col in Data.Collections) col.GameIds.Remove(game.Id);
         Save();
         await LoadAsync();
     }
 
-    private async Task LoadArtworkAsync(List<Game> games)
+    private async Task LoadArtworkAsync(List<Game> games, IProgress<(int Done, int Total)>? progress = null)
     {
         _artCts?.Cancel();
         var cts = _artCts = new CancellationTokenSource();
@@ -150,6 +161,8 @@ public sealed class AppState
 
         // Primeiro os jogos mais recentes, para o Início ficar pronto depressa.
         var ordered = games.OrderByDescending(g => g.LastPlayed ?? DateTime.MinValue).ToList();
+        int done = 0;
+        progress?.Report((0, ordered.Count));
 
         await Parallel.ForEachAsync(ordered, new ParallelOptions { MaxDegreeOfParallelism = 4, CancellationToken = cts.Token },
             async (g, ct) =>
@@ -157,6 +170,7 @@ public sealed class AppState
                 try { await LoadArtworkForAsync(art, g, ct); }
                 catch (OperationCanceledException) { throw; }
                 catch { /* uma imagem falhada não deve parar as outras */ }
+                progress?.Report((Interlocked.Increment(ref done), ordered.Count));
             }).ContinueWith(_ => { });
 
         if (!cts.IsCancellationRequested)
@@ -165,10 +179,13 @@ public sealed class AppState
 
     private async Task LoadArtworkForAsync(ArtworkService art, Game g, CancellationToken ct)
     {
-        var cover = await art.GetAsync(g, ArtKind.Cover, ct);
-        var hero = await art.GetAsync(g, ArtKind.Hero, ct);
-        var logo = await art.GetAsync(g, ArtKind.Logo, ct);
-        var header = hero is null || cover is null ? await art.GetAsync(g, ArtKind.Header, ct) : null;
+        // As imagens escolhidas à mão têm prioridade; só se procura o que faltar.
+        Data.CustomArt.TryGetValue(g.Id, out var custom);
+        var cover = CustomArtStore.Get(custom, ArtKind.Cover) ?? await art.GetAsync(g, ArtKind.Cover, ct);
+        var hero = CustomArtStore.Get(custom, ArtKind.Hero) ?? await art.GetAsync(g, ArtKind.Hero, ct);
+        var logo = CustomArtStore.Get(custom, ArtKind.Logo) ?? await art.GetAsync(g, ArtKind.Logo, ct);
+        var header = CustomArtStore.Get(custom, ArtKind.Header)
+                     ?? await art.GetAsync(g, ArtKind.Header, ct);
 
         Color? accent = g.Accent ?? ImageHelper.DominantColor(cover ?? header ?? hero);
 
@@ -186,14 +203,42 @@ public sealed class AppState
         });
     }
 
-    /// <summary>Volta a procurar imagens (ex.: depois de pôr a chave do SteamGridDB).</summary>
-    public void ReloadArtwork(bool retryMissing)
+    /// <summary>Volta a procurar imagens (ex.: depois de pôr a chave do SteamGridDB). Termina quando a procura acabar.</summary>
+    public Task ReloadArtworkAsync(bool retryMissing, IProgress<(int Done, int Total)>? progress = null)
     {
         if (retryMissing)
         {
             try { foreach (var f in Directory.EnumerateFiles(DataStore.CacheDir, "*.none")) File.Delete(f); } catch { }
         }
-        _ = LoadArtworkAsync(Games);
+        return LoadArtworkAsync(Games, progress);
+    }
+
+    // ------------------------------------------------------------ imagens escolhidas à mão
+
+    public bool HasCustomArt(Game g, ArtKind kind) =>
+        Data.CustomArt.TryGetValue(g.Id, out var art) && CustomArtStore.Get(art, kind) is not null;
+
+    /// <summary>Usa uma imagem escolhida pelo utilizador (null = volta à automática) e atualiza o jogo.</summary>
+    public async Task SetCustomArtAsync(Game g, ArtKind kind, string? sourceFile)
+    {
+        if (!Data.CustomArt.TryGetValue(g.Id, out var art)) Data.CustomArt[g.Id] = art = new CustomArtwork();
+        var old = CustomArtStore.Get(art, kind);
+        CustomArtStore.Set(art, kind, sourceFile is null ? null : CustomArtStore.Import(sourceFile, g.Id, kind));
+        CustomArtStore.Delete(old);
+        if (art.IsEmpty) Data.CustomArt.Remove(g.Id);
+
+        // A cor do jogo vem da capa: com capa nova, recalcula-a.
+        if (kind == ArtKind.Cover || g.CoverPath is null)
+        {
+            g.Accent = null;
+            Data.Colors.Remove(g.Id);
+        }
+        Save();
+
+        try { await LoadArtworkForAsync(new ArtworkService(SteamRoot, Data.Settings.SteamGridDbKey), g, CancellationToken.None); }
+        catch { }
+        Save();
+        LibraryChanged?.Invoke();
     }
 
     /// <summary>Se a conta Epic estiver ligada, vai buscar o tempo de jogo e junta-o aos jogos da Epic.</summary>

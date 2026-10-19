@@ -11,6 +11,9 @@ public sealed class UserData
     /// <summary>Cor de destaque calculada por jogo (hex), para não recalcular sempre.</summary>
     public Dictionary<string, string> Colors { get; set; } = new();
 
+    /// <summary>Imagens escolhidas à mão, por jogo (substituem as encontradas automaticamente).</summary>
+    public Dictionary<string, CustomArtwork> CustomArt { get; set; } = new();
+
     public AppSettings Settings { get; set; } = new();
 }
 
@@ -28,6 +31,17 @@ public sealed class CustomGame
     public string Store { get; set; } = "";
     public string Path { get; set; } = "";
     public string? Arguments { get; set; }
+}
+
+/// <summary>Caminhos das imagens escolhidas pelo utilizador (cópias guardadas na pasta "art" da app).</summary>
+public sealed class CustomArtwork
+{
+    public string? Cover { get; set; }
+    public string? Hero { get; set; }
+    public string? Logo { get; set; }
+    public string? Header { get; set; }
+
+    public bool IsEmpty => Cover is null && Hero is null && Logo is null && Header is null;
 }
 
 public sealed class PlaySession

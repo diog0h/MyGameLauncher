@@ -24,6 +24,8 @@ dotnet publish -c Release -o .
   ou launcher pode ser adicionado à mão (barra lateral → Adicionar jogo), com o nome de loja que quiseres.
 - **Barra de ajuda do comando**: aparece em baixo quando usas o comando, com os ícones Xbox ou PlayStation.
 - **Imagens**: primeiro da cache da própria Steam, depois da internet, depois do SteamGridDB (chave em Definições).
+  Também podes escolher as tuas (capa, plano de fundo, logótipo e capa ampla) ao adicionar um jogo ou em
+  **Personalizar**, na página de cada jogo.
   Ficam guardadas no PC.
 - **Comando e teclado**: comandos Xbox e PlayStation (DualShock 4 e DualSense, por cabo ou Bluetooth).
   Ver a tabela em Definições. F11 = ecrã inteiro.
@@ -35,7 +37,7 @@ dotnet publish -c Release -o .
 
 1. Instala o Inno Setup 6 (gratuito): https://jrsoftware.org/isdl.php
 2. Duplo clique em **criar-instalador.bat**.
-3. O instalador fica em `installer\Output\MyGameLauncher-Setup-1.0.2.exe`.
+3. O instalador fica em `installer\Output\MyGameLauncher-Setup-1.1.0.exe`.
 
 O instalador leva o .NET incluído (funciona em qualquer PC com Windows 10/11), cria atalhos no Menu Iniciar
 (e no Ambiente de Trabalho, se escolhido), aparece em Definições → Aplicações para desinstalar e, ao desinstalar,
