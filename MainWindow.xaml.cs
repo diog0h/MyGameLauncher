@@ -34,6 +34,8 @@ public partial class MainWindow : Window
 
     private readonly SolidColorBrush _themeBrush = new(DefaultAccent);
     private readonly Stack<(UserControl Page, RadioButton? Nav)> _history = new();
+    /// <summary>Elemento que tinha o foco em cada página do histórico, para o repor ao voltar atrás.</summary>
+    private readonly Dictionary<UserControl, (FrameworkElement Element, object? Item)> _returnFocus = new();
     private (UserControl Page, RadioButton? Nav)? _current;
     private readonly GamepadService _gamepad = new();
     public GamepadService Gamepad => _gamepad;
@@ -98,7 +100,14 @@ public partial class MainWindow : Window
 
     public void Navigate(UserControl page, RadioButton? nav = null, bool addToHistory = true)
     {
-        if (_current is { } cur && addToHistory) _history.Push(cur);
+        if (_current is { } cur && addToHistory)
+        {
+            _history.Push(cur);
+            if (Keyboard.FocusedElement is FrameworkElement fe && cur.Page.IsAncestorOf(fe))
+                _returnFocus[cur.Page] = (fe, fe.DataContext);
+            else
+                _returnFocus.Remove(cur.Page);
+        }
         Show(page, nav);
     }
 
@@ -136,11 +145,42 @@ public partial class MainWindow : Window
         var (page, nav) = _history.Pop();
         Show(page, nav);
         (page as IPage)?.OnReturned();
+
+        // O foco ficava na página que se fechou (já fora do ecrã) e o comando deixava de mexer em nada.
+        // Repõe-no no cartão/botão de onde se saiu, depois de a página voltar a ser desenhada.
+        _returnFocus.Remove(page, out var saved);
+        Dispatcher.BeginInvoke(() => RestoreFocus(page, saved), System.Windows.Threading.DispatcherPriority.ContextIdle);
+    }
+
+    private void RestoreFocus(UserControl page, (FrameworkElement Element, object? Item) saved)
+    {
+        if (ContentHost.Content != page) return; // entretanto mudou de página
+
+        FrameworkElement? target = null;
+        if (saved.Element is { } el && page.IsAncestorOf(el) && el.IsVisible && el.Focusable)
+            target = el;
+        else if (saved.Item is Game game)
+            // A página reconstruiu os cartões: procura o do mesmo jogo.
+            target = FindDescendants<ButtonBase>(page).FirstOrDefault(b => b.DataContext == game && b.IsVisible);
+
+        if (target is not null && target.Focus()) target.BringIntoView();
+        else FocusContent();
+    }
+
+    private static IEnumerable<T> FindDescendants<T>(DependencyObject root) where T : DependencyObject
+    {
+        for (int i = 0; i < VisualTreeHelper.GetChildrenCount(root); i++)
+        {
+            var child = VisualTreeHelper.GetChild(root, i);
+            if (child is T t) yield return t;
+            foreach (var inner in FindDescendants<T>(child)) yield return inner;
+        }
     }
 
     public void GoHome()
     {
         _history.Clear();
+        _returnFocus.Clear();
         SearchBox.Text = "";
         Show(new HomePage(), NavHome);
     }
@@ -286,6 +326,7 @@ public partial class MainWindow : Window
 
         // Recria a página atual na nova língua; o histórico tinha páginas na língua antiga.
         _history.Clear();
+        _returnFocus.Clear();
         if (_current is { } cur)
         {
             UserControl fresh = cur.Page switch
@@ -612,7 +653,9 @@ public partial class MainWindow : Window
 
     private bool MoveFocus(FocusNavigationDirection dir)
     {
-        if (Keyboard.FocusedElement is not UIElement el || !IsAncestorOf(el))
+        // Sem foco "útil" (nada, a própria janela, ou um elemento que já saiu do ecrã): começa pela página.
+        if (Keyboard.FocusedElement is not UIElement el || el == this || el == ContentHost
+            || !IsAncestorOf(el) || !el.IsVisible)
         {
             FocusContent();
             return true;
