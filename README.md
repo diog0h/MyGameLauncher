@@ -36,7 +36,7 @@
   </tr>
   <tr>
     <td width="50%"><img src="docs/screenshots/playtime.png" alt="Playtime"><p align="center"><sub>Playtime from Steam and Epic</sub></p></td>
-    <td width="50%"><img src="docs/screenshots/home.png" alt="Home"><p align="center"><sub>Console-style home screen</sub></p></td>
+    <td width="50%"><img src="docs/screenshots/controller.png" alt="Controller hints"><p align="center"><sub>Play from the couch with an Xbox or PlayStation controller</sub></p></td>
   </tr>
 </table>
 

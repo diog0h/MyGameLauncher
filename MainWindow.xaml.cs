@@ -399,7 +399,9 @@ public partial class MainWindow : Window
         _hintsVisible = true;
         HintBar.Visibility = Visibility.Visible;
         HintBar.BeginAnimation(OpacityProperty, new DoubleAnimation(1, TimeSpan.FromMilliseconds(180)));
-        ContentHost.Margin = new Thickness(0, 0, 0, HintBar.Height); // o conteúdo não fica tapado
+        // O conteúdo e o fundo da barra lateral (Definições / Ecrã inteiro) não ficam tapados.
+        ContentHost.Margin = new Thickness(0, 0, 0, HintBar.Height);
+        SidebarPanel.Margin = new Thickness(12, 16, 12, 14 + HintBar.Height);
     }
 
     private void HideHints()
@@ -410,6 +412,7 @@ public partial class MainWindow : Window
         fade.Completed += (_, _) => { if (!_hintsVisible) HintBar.Visibility = Visibility.Collapsed; };
         HintBar.BeginAnimation(OpacityProperty, fade);
         ContentHost.Margin = new Thickness(0);
+        SidebarPanel.Margin = new Thickness(12, 16, 12, 14);
     }
 
     /// <summary>Mostra só as ações que fazem sentido agora, com os ícones do comando em uso.</summary>

@@ -38,7 +38,7 @@
 
             <!-- ================= Barra lateral ================= -->
             <Border Grid.Column="0" Background="#2E000000">
-                <DockPanel Margin="12,16,12,14">
+                <DockPanel x:Name="SidebarPanel" Margin="12,16,12,14">
                     <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="8,0,0,18">
                         <Image Source="Assets/app.png" Width="30" Height="30"
                                RenderOptions.BitmapScalingMode="HighQuality"/>
