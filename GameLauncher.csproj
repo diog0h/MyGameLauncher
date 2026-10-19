@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>GameLauncher</RootNamespace>
+    <AssemblyName>MyGameLauncher</AssemblyName>
+    <ApplicationIcon>Assets\app.ico</ApplicationIcon>
+    <Product>MyGameLauncher</Product>
+    <Version>1.0.0</Version>
+    <Authors>diog0_h</Authors>
+    <Company>diog0_h</Company>
+    <Copyright>© 2026 diog0_h</Copyright>
+    <Description>Launcher para todos os jogos (Steam, Epic Games, Ubisoft Connect e outros)</Description>
+    <!-- Permite compilar também fora do Windows (só para verificação). -->
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+
+    <!-- Ao publicar: um único MyGameLauncher.exe com o .NET incluído (funciona em qualquer PC com Windows 10/11). -->
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>true</SelfContained>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+    <PublishSingleFile>true</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <DebugType>none</DebugType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="THIRD-PARTY-NOTICES.txt" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\app.ico" />
+    <Resource Include="Assets\app.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="HidSharp" Version="2.1.0" />
+  </ItemGroup>
+
+</Project>

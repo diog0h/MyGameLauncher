@@ -1,0 +1,88 @@
+<UserControl x:Class="GameLauncher.Views.HomePage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:GameLauncher"
+             xmlns:l="clr-namespace:GameLauncher.Localization">
+    <ScrollViewer x:Name="PageScroll" VerticalScrollBarVisibility="Auto" Focusable="False">
+        <StackPanel Margin="0,0,0,30">
+
+            <!-- ================= Destaque: continuar a jogar ================= -->
+            <Grid x:Name="Hero" Height="480" SizeChanged="Banner_SizeChanged">
+                <!-- Arte do jogo, a desvanecer para a esquerda e para baixo -->
+                <Border x:Name="BannerArt" ClipToBounds="True" VerticalAlignment="Top">
+                    <Border.OpacityMask>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                            <GradientStop Color="Black" Offset="0"/>
+                            <GradientStop Color="Black" Offset="0.6"/>
+                            <GradientStop Color="Transparent" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Border.OpacityMask>
+                    <Border>
+                        <Border.OpacityMask>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                <GradientStop Color="Transparent" Offset="0.1"/>
+                                <GradientStop Color="#99000000" Offset="0.35"/>
+                                <GradientStop Color="Black" Offset="0.6"/>
+                            </LinearGradientBrush>
+                        </Border.OpacityMask>
+                        <!-- Sempre a largura toda (sem cortes nos lados); em janelas muito largas corta só em baixo -->
+                        <Border.Background>
+                            <ImageBrush ImageSource="{Binding BannerPath, Converter={StaticResource PathToImage}, ConverterParameter=1920}"
+                                        Stretch="UniformToFill" AlignmentX="Center" AlignmentY="Top"/>
+                        </Border.Background>
+                    </Border>
+                </Border>
+
+                <StackPanel VerticalAlignment="Bottom" Margin="44,0,44,26">
+                    <TextBlock Text="{l:Tr Home_Continue}" Style="{StaticResource Eyebrow}" Margin="0,0,0,14"/>
+                    <Grid HorizontalAlignment="Left" MaxWidth="460">
+                        <Image Source="{Binding LogoPath, Converter={StaticResource PathToImage}, ConverterParameter=900}"
+                               MaxHeight="150" Stretch="Uniform" HorizontalAlignment="Left"
+                               RenderOptions.BitmapScalingMode="HighQuality">
+                            <Image.Effect>
+                                <DropShadowEffect BlurRadius="20" ShadowDepth="0" Opacity="0.5"/>
+                            </Image.Effect>
+                        </Image>
+                        <TextBlock Text="{Binding Name}" FontSize="46" FontWeight="Bold" TextWrapping="Wrap"
+                                   Visibility="{Binding LogoPath, Converter={StaticResource NullToVis}}"/>
+                    </Grid>
+                    <TextBlock Margin="0,14,0,0" Foreground="{StaticResource SubtleTextBrush}" FontSize="13.5">
+                        <Run Text="{Binding PlaytimeSummary, Mode=OneWay}"/><Run Text="  ·  "/><Run Text="{Binding LastPlayedText, Mode=OneWay}"/>
+                    </TextBlock>
+                    <StackPanel Orientation="Horizontal" Margin="0,20,0,0">
+                        <Button x:Name="HeroPlay" Style="{StaticResource PrimaryButton}" MinWidth="150"
+                                Command="{x:Static local:AppCommands.PlayGame}" CommandParameter="{Binding}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE768;" Style="{StaticResource Icon}" Margin="0,0,10,0"/>
+                                <TextBlock Text="{Binding PlayButtonText}"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource RoundIconButton}" Margin="14,0,0,0" ToolTip="{l:Tr Details}"
+                                Content="&#xE946;"
+                                Command="{x:Static local:AppCommands.OpenGame}" CommandParameter="{Binding}"/>
+                        <Button Margin="10,0,0,0" ToolTip="{l:Tr FavoriteTooltip}"
+                                Command="{x:Static local:AppCommands.ToggleFavorite}" CommandParameter="{Binding}">
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource RoundIconButton}">
+                                    <Setter Property="Content" Value="&#xEB51;"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsFavorite}" Value="True">
+                                            <Setter Property="Content" Value="&#xEB52;"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+
+            <TextBlock x:Name="EmptyText" Visibility="Collapsed" Margin="44,120,44,0" FontSize="16" TextWrapping="Wrap"
+                       Foreground="{StaticResource SubtleTextBrush}"
+                       Text="{l:Tr Home_Empty}"/>
+
+            <!-- Filas criadas no código: Pronto a jogar, Favoritos e uma por coleção -->
+            <StackPanel x:Name="Rows" Margin="0,10,0,0"/>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

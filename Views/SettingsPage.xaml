@@ -1,0 +1,232 @@
+<UserControl x:Class="GameLauncher.Views.SettingsPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:l="clr-namespace:GameLauncher.Localization">
+    <UserControl.Resources>
+        <Style x:Key="Card" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
+            <Setter Property="CornerRadius" Value="14"/>
+            <Setter Property="Padding" Value="22,18"/>
+            <Setter Property="Margin" Value="0,0,0,14"/>
+            <Setter Property="MaxWidth" Value="860"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+        </Style>
+        <Style x:Key="CardTitle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="17"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Margin" Value="0,0,0,4"/>
+        </Style>
+        <Style TargetType="Hyperlink">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Foreground" Value="#FFFFE08A"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="CardText" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource SubtleTextBrush}"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="Margin" Value="0,0,0,12"/>
+        </Style>
+    </UserControl.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Focusable="False">
+        <StackPanel Margin="44,76,40,40">
+            <TextBlock Text="{l:Tr Nav_Settings}" FontSize="34" FontWeight="Bold" Margin="0,0,0,24"/>
+
+            <!-- Idioma -->
+            <Border Style="{StaticResource Card}">
+                <StackPanel>
+                    <TextBlock Text="{l:Tr Set_Language}" Style="{StaticResource CardTitle}"/>
+                    <TextBlock Text="{l:Tr Set_LanguageDesc}" Style="{StaticResource CardText}"/>
+                    <WrapPanel x:Name="LanguageChips"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Conta Epic (só tempo de jogo) -->
+            <Border Style="{StaticResource Card}">
+                <StackPanel>
+                    <TextBlock Text="{l:Tr Set_EpicTitle}" Style="{StaticResource CardTitle}"/>
+                    <TextBlock Text="{l:Tr Set_EpicDesc}" Style="{StaticResource CardText}"/>
+
+                    <!-- O que a ligação faz e não faz -->
+                    <Border Background="#30000000" CornerRadius="10" Padding="16,12" Margin="0,0,0,14">
+                        <StackPanel>
+                            <DockPanel Margin="0,2">
+                                <TextBlock Text="&#xE73E;" Style="{StaticResource Icon}" Width="24" Foreground="#FF8FE3A0"/>
+                                <TextBlock Text="{l:Tr Set_EpicOnly}" TextWrapping="Wrap"/>
+                            </DockPanel>
+                            <DockPanel Margin="0,2">
+                                <TextBlock Text="&#xE73E;" Style="{StaticResource Icon}" Width="24" Foreground="#FF8FE3A0"/>
+                                <TextBlock Text="{l:Tr Set_EpicNoPassword}" TextWrapping="Wrap"/>
+                            </DockPanel>
+                            <DockPanel Margin="0,2">
+                                <TextBlock Text="&#xE73E;" Style="{StaticResource Icon}" Width="24" Foreground="#FF8FE3A0"/>
+                                <TextBlock Text="{l:Tr Set_EpicStored}" TextWrapping="Wrap"/>
+                            </DockPanel>
+                            <DockPanel Margin="0,2">
+                                <TextBlock Text="&#xE711;" Style="{StaticResource Icon}" Width="24" Foreground="#FFFFA3A3"/>
+                                <TextBlock Text="{l:Tr Set_EpicNoChanges}" TextWrapping="Wrap"/>
+                            </DockPanel>
+                            <DockPanel Margin="0,2">
+                                <TextBlock Text="&#xE7BA;" Style="{StaticResource Icon}" Width="24" Foreground="#FFFFD580"/>
+                                <TextBlock Text="{l:Tr Set_EpicUnofficial}" TextWrapping="Wrap"/>
+                            </DockPanel>
+                            <DockPanel Margin="0,2">
+                                <TextBlock Text="&#xE7BA;" Style="{StaticResource Icon}" Width="24" Foreground="#FFFFD580"/>
+                                <TextBlock Text="{l:Tr Set_EpicWarning}" TextWrapping="Wrap"/>
+                            </DockPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Não ligado: dois passos -->
+                    <StackPanel x:Name="EpicDisconnected">
+                        <TextBlock Text="{l:Tr Set_EpicStep1}" TextWrapping="Wrap" Margin="0,0,0,8"/>
+                        <Button Style="{StaticResource GlassButton}" HorizontalAlignment="Left" Click="EpicOpenLogin_Click">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE8A7;" Style="{StaticResource Icon}" Margin="0,0,8,0"/>
+                                <TextBlock Text="{l:Tr Set_EpicOpenLogin}"/>
+                            </StackPanel>
+                        </Button>
+                        <TextBlock Text="{l:Tr Set_EpicStep2}" TextWrapping="Wrap" Margin="0,16,0,8"/>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBox x:Name="EpicCodeBox" Style="{StaticResource RoundTextBox}" Width="420" Padding="14,8"
+                                     Tag="{l:Tr Set_EpicCodeHint}"/>
+                            <Button x:Name="EpicConnectButton" Style="{StaticResource PrimaryButton}" Margin="10,0,0,0"
+                                    Padding="20,8" Content="{l:Tr Set_EpicConnect}" Click="EpicConnect_Click"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- Ligado -->
+                    <StackPanel x:Name="EpicConnected" Visibility="Collapsed">
+                        <TextBlock x:Name="EpicConnectedText" FontWeight="SemiBold"/>
+                        <TextBlock x:Name="EpicSyncText" Foreground="{StaticResource SubtleTextBrush}" Margin="0,4,0,12"/>
+                        <StackPanel Orientation="Horizontal">
+                            <Button Style="{StaticResource GlassButton}" Content="{l:Tr Set_EpicSync}" Click="EpicSync_Click"/>
+                            <Button Style="{StaticResource GlassButton}" Margin="10,0,0,0" Content="{l:Tr Set_EpicDisconnect}"
+                                    Click="EpicDisconnect_Click"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <TextBlock x:Name="EpicStatus" Margin="2,12,0,0" TextWrapping="Wrap"
+                               Foreground="{StaticResource SubtleTextBrush}" Visibility="Collapsed"/>
+                </StackPanel>
+            </Border>
+
+            <!-- SteamGridDB -->
+            <Border Style="{StaticResource Card}">
+                <StackPanel>
+                    <TextBlock Text="{l:Tr Set_SgdbTitle}" Style="{StaticResource CardTitle}"/>
+                    <TextBlock Text="{l:Tr Set_SgdbDesc}" Style="{StaticResource CardText}"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBox x:Name="KeyBox" Style="{StaticResource RoundTextBox}" Width="380" Padding="14,8"
+                                 Tag="{l:Tr Set_SgdbHint}"/>
+                        <Button Style="{StaticResource GlassButton}" Margin="10,0,0,0" Content="{l:Tr Save}" Click="SaveKey_Click"/>
+                    </StackPanel>
+                    <TextBlock x:Name="KeyStatus" Margin="4,10,0,0" Foreground="{StaticResource SubtleTextBrush}"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Imagens -->
+            <Border Style="{StaticResource Card}">
+                <StackPanel>
+                    <TextBlock Text="{l:Tr Set_Images}" Style="{StaticResource CardTitle}"/>
+                    <TextBlock x:Name="CacheText" Style="{StaticResource CardText}"/>
+                    <StackPanel Orientation="Horizontal">
+                        <Button Style="{StaticResource GlassButton}" Content="{l:Tr Set_RetryArt}" Click="RetryArt_Click"/>
+                        <Button Style="{StaticResource GlassButton}" Margin="10,0,0,0" Content="{l:Tr Set_ClearCache}"
+                                Click="ClearCache_Click"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Ecrã -->
+            <Border Style="{StaticResource Card}">
+                <StackPanel>
+                    <TextBlock Text="{l:Tr Set_Screen}" Style="{StaticResource CardTitle}"/>
+                    <TextBlock Text="{l:Tr Set_ScreenDesc}" Style="{StaticResource CardText}"/>
+                    <CheckBox x:Name="FullscreenCheck" Style="{StaticResource ChipToggle}" HorizontalAlignment="Left"
+                              Content="{l:Tr Set_StartFullscreen}" Checked="Fullscreen_Changed" Unchecked="Fullscreen_Changed"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Teclado e comando -->
+            <Border Style="{StaticResource Card}">
+                <StackPanel>
+                    <TextBlock Text="{l:Tr Set_Input}" Style="{StaticResource CardTitle}"/>
+                    <TextBlock Text="{l:Tr Set_InputDesc}" Style="{StaticResource CardText}" Margin="0,0,0,4"/>
+                    <TextBlock x:Name="ControllersText" Style="{StaticResource CardText}" Foreground="White"/>
+                    <Grid x:Name="ShortcutsGrid">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="240"/>
+                            <ColumnDefinition Width="190"/>
+                            <ColumnDefinition Width="170"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- Diagnóstico -->
+            <Border Style="{StaticResource Card}">
+                <StackPanel>
+                    <DockPanel>
+                        <Button DockPanel.Dock="Right" Style="{StaticResource GlassButton}" Content="{l:Tr Set_Reload}"
+                                Click="Reload_Click"/>
+                        <TextBlock Text="{l:Tr Set_Diagnostics}" Style="{StaticResource CardTitle}" VerticalAlignment="Center"/>
+                    </DockPanel>
+                    <TextBox x:Name="LogBox" IsReadOnly="True" TextWrapping="Wrap" Margin="0,12,0,0" Padding="12"
+                             Background="#33000000" Foreground="{StaticResource SubtleTextBrush}" BorderThickness="0"
+                             FontFamily="Consolas" FontSize="12" Width="810"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Sobre e créditos -->
+            <Border Style="{StaticResource Card}">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                        <Image Source="/Assets/app.png" Width="40" Height="40" RenderOptions.BitmapScalingMode="HighQuality"/>
+                        <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
+                            <TextBlock Text="MyGameLauncher" FontSize="17" FontWeight="SemiBold"/>
+                            <TextBlock x:Name="VersionText" Foreground="{StaticResource SubtleTextBrush}"/>
+                            <TextBlock x:Name="AuthorText" Foreground="{StaticResource SubtleTextBrush}"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <TextBlock Text="{l:Tr About_Credits}" Style="{StaticResource CardTitle}" FontSize="15" Margin="0,4,0,8"/>
+                    <StackPanel x:Name="CreditsPanel" TextElement.Foreground="{StaticResource TextBrush}">
+                        <TextBlock TextWrapping="Wrap" Margin="0,3">
+                            <Run Text="{l:Tr About_Images}"/>
+                            <Hyperlink NavigateUri="https://www.steamgriddb.com" RequestNavigate="Link_RequestNavigate">SteamGridDB</Hyperlink>
+                        </TextBlock>
+                        <TextBlock TextWrapping="Wrap" Margin="0,3">
+                            <Run Text="{l:Tr About_Hid}"/>
+                            <Hyperlink NavigateUri="http://www.zer7.com/software/hidsharp" RequestNavigate="Link_RequestNavigate">HidSharp</Hyperlink>
+                            <Run Text="— James F. Bellinger (Apache 2.0)"/>
+                        </TextBlock>
+                        <TextBlock TextWrapping="Wrap" Margin="0,3">
+                            <Run Text="{l:Tr About_Icons}"/>
+                            <Hyperlink NavigateUri="https://zacksly.itch.io" RequestNavigate="Link_RequestNavigate">Zacksly</Hyperlink>
+                            <Run Text="(CC BY)"/>
+                        </TextBlock>
+                        <TextBlock TextWrapping="Wrap" Margin="0,3">
+                            <Run Text="{l:Tr About_Dotnet}"/>
+                            <Hyperlink NavigateUri="https://dotnet.microsoft.com" RequestNavigate="Link_RequestNavigate">.NET</Hyperlink>
+                            <Run Text="+ WPF (MIT)"/>
+                        </TextBlock>
+                    </StackPanel>
+
+                    <TextBlock Text="{l:Tr About_Trademarks}" Style="{StaticResource CardText}" FontSize="12" Margin="0,14,0,12"/>
+                    <Button Style="{StaticResource GlassButton}" HorizontalAlignment="Left" Click="Licenses_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE8A5;" Style="{StaticResource Icon}" Margin="0,0,8,0"/>
+                            <TextBlock Text="{l:Tr About_Licenses}"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

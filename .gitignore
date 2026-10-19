@@ -1,0 +1,16 @@
+# Compilação
+bin/
+obj/
+publish/
+publish-instalador/
+installer/Output/
+
+# Executáveis (vão para as Releases, não para o código)
+*.exe
+
+# Visual Studio / Rider / VS Code
+.vs/
+.idea/
+.vscode/
+*.user
+*.suo

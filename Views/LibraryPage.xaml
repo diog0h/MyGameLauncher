@@ -1,0 +1,46 @@
+<UserControl x:Class="GameLauncher.Views.LibraryPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:l="clr-namespace:GameLauncher.Localization">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Focusable="False">
+        <StackPanel Margin="44,76,30,30">
+            <DockPanel>
+                <Button x:Name="DeleteCollectionButton" DockPanel.Dock="Right" Style="{StaticResource GlassButton}"
+                        VerticalAlignment="Center" Visibility="Collapsed" Click="DeleteCollection_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE74D;" Style="{StaticResource Icon}" Margin="0,0,8,0"/>
+                        <TextBlock Text="{l:Tr Lib_DeleteCollection}"/>
+                    </StackPanel>
+                </Button>
+                <StackPanel>
+                    <TextBlock x:Name="HeaderText" FontSize="34" FontWeight="Bold"/>
+                    <TextBlock x:Name="CountText" Foreground="{StaticResource SubtleTextBrush}" Margin="0,4,0,0"/>
+                </StackPanel>
+            </DockPanel>
+
+            <!-- Ordenar -->
+            <StackPanel Orientation="Horizontal" Margin="0,22,0,22">
+                <TextBlock Text="{l:Tr Lib_Sort}" Style="{StaticResource Eyebrow}" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                <RadioButton x:Name="SortRecent" Style="{StaticResource ChipRadio}" GroupName="Sort" Tag="recent"
+                             Content="{l:Tr Sort_Recent}" Checked="Sort_Checked"/>
+                <RadioButton x:Name="SortName" Style="{StaticResource ChipRadio}" GroupName="Sort" Tag="name"
+                             Content="{l:Tr Sort_Name}" Checked="Sort_Checked"/>
+                <RadioButton x:Name="SortPlaytime" Style="{StaticResource ChipRadio}" GroupName="Sort" Tag="playtime"
+                             Content="{l:Tr Sort_Playtime}" Checked="Sort_Checked"/>
+                <RadioButton x:Name="SortSize" Style="{StaticResource ChipRadio}" GroupName="Sort" Tag="size"
+                             Content="{l:Tr Sort_Size}" Checked="Sort_Checked"/>
+            </StackPanel>
+
+            <ItemsControl x:Name="GamesGrid" Focusable="False" ItemTemplate="{StaticResource CoverCardTemplate}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+
+            <TextBlock x:Name="EmptyText" Visibility="Collapsed" FontSize="15" Margin="0,30,0,0" TextWrapping="Wrap"
+                       Foreground="{StaticResource SubtleTextBrush}"/>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>
