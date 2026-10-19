@@ -18,7 +18,19 @@ public partial class MainWindow : Window
 {
     public static MainWindow Current { get; private set; } = null!;
 
-    public static readonly Color DefaultAccent = Color.FromRgb(0xB3, 0x20, 0x2A);
+    /// <summary>Cores que se podem escolher nas Definições (a primeira é a por defeito).</summary>
+    public static readonly (string Key, string Hex)[] ThemeColors =
+    {
+        ("Color_Grey", "#2A2B33"),
+        ("Color_Red", "#B3202A"),
+        ("Color_Blue", "#1F4E8C"),
+        ("Color_Purple", "#4B2C7A"),
+        ("Color_Green", "#1E5C3A"),
+    };
+
+    /// <summary>Cor de fundo escolhida pelo utilizador (cinzento-escuro se não escolheu).</summary>
+    public static Color DefaultAccent =>
+        ImageHelper.FromHex(AppState.Current.Data.Settings.ThemeColor) ?? ImageHelper.FromHex(ThemeColors[0].Hex)!.Value;
 
     private readonly SolidColorBrush _themeBrush = new(DefaultAccent);
     private readonly Stack<(UserControl Page, RadioButton? Nav)> _history = new();
@@ -436,7 +448,7 @@ public partial class MainWindow : Window
 
     public void SetAccent(Color? color)
     {
-        var target = color ?? DefaultAccent;
+        var target = State.Data.Settings.UseGameColors ? color ?? DefaultAccent : DefaultAccent;
         if (_themeBrush.Color == target) return;
         var anim = new ColorAnimation(target, TimeSpan.FromMilliseconds(600))
         {

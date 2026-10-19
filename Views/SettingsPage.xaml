@@ -45,6 +45,18 @@
                 </StackPanel>
             </Border>
 
+            <!-- Aparência -->
+            <Border Style="{StaticResource Card}">
+                <StackPanel>
+                    <TextBlock Text="{l:Tr Set_Appearance}" Style="{StaticResource CardTitle}"/>
+                    <TextBlock Text="{l:Tr Set_AppearanceDesc}" Style="{StaticResource CardText}"/>
+                    <WrapPanel x:Name="ColorChips"/>
+                    <CheckBox x:Name="GameColorsCheck" Style="{StaticResource ChipToggle}" HorizontalAlignment="Left"
+                              Margin="0,6,0,0" Content="{l:Tr Set_UseGameColors}"
+                              Checked="GameColors_Changed" Unchecked="GameColors_Changed"/>
+                </StackPanel>
+            </Border>
+
             <!-- Conta Epic (só tempo de jogo) -->
             <Border Style="{StaticResource Card}">
                 <StackPanel>

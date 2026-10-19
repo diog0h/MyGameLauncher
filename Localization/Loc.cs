@@ -292,6 +292,15 @@ public sealed class Loc : INotifyPropertyChanged
             "No se pudo leer el tiempo de juego. Si sigue fallando, desconecta y vuelve a conectar la cuenta.",
             "Impossible de lire le temps de jeu. Si ça continue, déconnecte puis reconnecte le compte.",
             "Spielzeit konnte nicht gelesen werden. Wenn das weiter passiert, trenne das Konto und verbinde es erneut.");
+        Add("Set_Appearance", "Aparência", "Appearance", "Apariencia", "Apparence", "Darstellung");
+        Add("Set_AppearanceDesc", "Cor de fundo da app.", "App background color.", "Color de fondo de la app.", "Couleur de fond de l’app.", "Hintergrundfarbe der App.");
+        Add("Set_UseGameColors", "Usar a cor de cada jogo no Início e na página do jogo", "Use each game's color on Home and game pages",
+            "Usar el color de cada juego en Inicio y en la página del juego", "Utiliser la couleur de chaque jeu sur l’accueil et la page du jeu", "Farbe des jeweiligen Spiels auf Start- und Spielseite verwenden");
+        Add("Color_Grey", "Cinzento", "Gray", "Gris", "Gris", "Grau");
+        Add("Color_Red", "Vermelho", "Red", "Rojo", "Rouge", "Rot");
+        Add("Color_Blue", "Azul", "Blue", "Azul", "Bleu", "Blau");
+        Add("Color_Purple", "Roxo", "Purple", "Morado", "Violet", "Lila");
+        Add("Color_Green", "Verde", "Green", "Verde", "Vert", "Grün");
         Add("Set_SgdbTitle", "Capas do SteamGridDB", "SteamGridDB artwork", "Portadas de SteamGridDB", "Jaquettes SteamGridDB", "SteamGridDB-Cover");
         Add("Set_SgdbDesc",
             "Usado quando a Steam não tem imagem para um jogo. A chave fica guardada só neste PC.",

@@ -47,6 +47,12 @@ public sealed class AppSettings
     /// <summary>Código da língua (pt, en, es, fr, de). Vazio = a do Windows.</summary>
     public string? Language { get; set; }
 
+    /// <summary>Cor de fundo da app (hex). Vazio = cinzento-escuro por defeito.</summary>
+    public string? ThemeColor { get; set; }
+
+    /// <summary>No Início e na página do jogo, usar a cor da capa do jogo.</summary>
+    public bool UseGameColors { get; set; } = true;
+
     /// <summary>Tamanho e posição da janela da última vez (null = ainda não há).</summary>
     public WindowPlacement? Window { get; set; }
 }

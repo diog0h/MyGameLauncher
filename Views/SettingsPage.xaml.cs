@@ -39,6 +39,8 @@ public partial class SettingsPage : UserControl, IPage
         KeyStatus.Text = Loc.T(string.IsNullOrWhiteSpace(KeyBox.Text) ? "Set_NoKey" : "Set_KeySet");
         FullscreenCheck.IsChecked = State.Data.Settings.StartFullscreen;
         BuildLanguageChips();
+        BuildColorChips();
+        GameColorsCheck.IsChecked = State.Data.Settings.UseGameColors;
         var v = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
         VersionText.Text = Loc.F("About_Version", v is null ? "?" : $"{v.Major}.{v.Minor}.{v.Build}");
         AuthorText.Text = Loc.F("About_MadeBy", "diog0_h");
@@ -87,6 +89,51 @@ public partial class SettingsPage : UserControl, IPage
         State.Save();
         // Adia um pouco para o clique terminar antes de a página ser recriada na nova língua.
         Dispatcher.BeginInvoke(() => Loc.SetLanguage(code), DispatcherPriority.Background);
+    }
+
+    // ------------------------------------------------------------ aparência
+
+    private void BuildColorChips()
+    {
+        var current = State.Data.Settings.ThemeColor ?? MainWindow.ThemeColors[0].Hex;
+        foreach (var (key, hex) in MainWindow.ThemeColors)
+        {
+            var swatch = new System.Windows.Shapes.Ellipse
+            {
+                Width = 14, Height = 14, Margin = new Thickness(0, 0, 8, 0),
+                Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString(hex)),
+                Stroke = new SolidColorBrush(Color.FromArgb(0x88, 0xFF, 0xFF, 0xFF)), StrokeThickness = 1,
+                VerticalAlignment = VerticalAlignment.Center,
+            };
+            var label = new TextBlock { VerticalAlignment = VerticalAlignment.Center };
+            label.SetBinding(TextBlock.TextProperty, new System.Windows.Data.Binding($"[{key}]") { Source = Loc.Instance });
+            var chip = new RadioButton
+            {
+                Content = new StackPanel { Orientation = Orientation.Horizontal, Children = { swatch, label } },
+                GroupName = "ThemeColor",
+                Tag = hex,
+                Style = (Style)FindResource("ChipRadio"),
+                Margin = new Thickness(0, 0, 8, 8),
+                IsChecked = hex.Equals(current, StringComparison.OrdinalIgnoreCase),
+            };
+            chip.Checked += Color_Checked;
+            ColorChips.Children.Add(chip);
+        }
+    }
+
+    private void Color_Checked(object sender, RoutedEventArgs e)
+    {
+        if (!_ready || (sender as FrameworkElement)?.Tag is not string hex) return;
+        State.Data.Settings.ThemeColor = hex == MainWindow.ThemeColors[0].Hex ? null : hex;
+        State.Save();
+        MainWindow.Current.SetAccent(null); // esta página usa a cor escolhida
+    }
+
+    private void GameColors_Changed(object sender, RoutedEventArgs e)
+    {
+        if (!_ready) return;
+        State.Data.Settings.UseGameColors = GameColorsCheck.IsChecked == true;
+        State.Save();
     }
 
     // ------------------------------------------------------------ conta Epic (só tempo de jogo)
