@@ -69,6 +69,14 @@
                                 <TextBlock Text="{Binding PlayButtonText}"/>
                             </StackPanel>
                         </Button>
+                        <!-- Só aparece com o jogo aberto: fecha-o à força (como o "Parar" da Steam) -->
+                        <Button Style="{StaticResource GlassButton}" Margin="10,0,0,0" Click="StopGame_Click"
+                                Visibility="{Binding IsRunning, Converter={StaticResource BoolToVis}}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE71A;" Style="{StaticResource Icon}" Margin="0,0,8,0"/>
+                                <TextBlock Text="{l:Tr Game_Stop}"/>
+                            </StackPanel>
+                        </Button>
                         <Button Margin="14,0,0,0" ToolTip="{l:Tr FavoriteTooltip}"
                                 Command="{x:Static local:AppCommands.ToggleFavorite}" CommandParameter="{Binding}">
                             <Button.Style>
@@ -111,6 +119,15 @@
                             </StackPanel>
                         </Button>
                     </StackPanel>
+
+                    <!-- O jogo fechou mas ficou um processo pendurado -->
+                    <Border Visibility="{Binding IsStuck, Converter={StaticResource BoolToVis}}" HorizontalAlignment="Left"
+                            Background="{StaticResource SurfaceStrongBrush}" CornerRadius="12" Padding="14,10" Margin="0,14,0,0" MaxWidth="640">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE7BA;" Style="{StaticResource Icon}" Margin="0,2,10,0" VerticalAlignment="Top"/>
+                            <TextBlock Text="{l:Tr Game_StuckHint}" TextWrapping="Wrap" MaxWidth="580"/>
+                        </StackPanel>
+                    </Border>
                 </StackPanel>
             </Grid>
 

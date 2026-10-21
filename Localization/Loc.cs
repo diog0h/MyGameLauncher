@@ -110,6 +110,21 @@ public sealed class Loc : INotifyPropertyChanged
             "Elige un archivo que exista (o escribe un enlace, p. ej. battlenet://).",
             "Choisis un fichier existant (ou saisis un lien, ex. battlenet://).",
             "Wähle eine vorhandene Datei (oder gib einen Link ein, z. B. battlenet://).");
+        // Fechar um jogo à força
+        Add("Game_Stop", "Fechar jogo", "Close game", "Cerrar juego", "Fermer le jeu", "Spiel beenden");
+        Add("Game_StopConfirm",
+            "Fechar {0} à força?\n\nUsa isto só se o jogo não fechar sozinho: o progresso que não estiver guardado perde-se.",
+            "Force {0} to close?\n\nOnly use this if the game won't close on its own: any unsaved progress will be lost.",
+            "¿Forzar el cierre de {0}?\n\nÚsalo solo si el juego no se cierra solo: se perderá el progreso no guardado.",
+            "Forcer la fermeture de {0} ?\n\nÀ utiliser seulement si le jeu ne se ferme pas tout seul : la progression non sauvegardée sera perdue.",
+            "{0} zwangsweise beenden?\n\nNur verwenden, wenn sich das Spiel nicht selbst schließt: nicht gespeicherter Fortschritt geht verloren.");
+        Add("Game_StuckHint",
+            "O jogo parece ter fechado, mas um processo dele continua aberto em segundo plano. O tempo de jogo já não está a contar. Usa \"Fechar jogo\" para o terminar.",
+            "The game seems to have closed, but one of its processes is still running in the background. Playtime is no longer being counted. Use \"Close game\" to end it.",
+            "El juego parece haberse cerrado, pero uno de sus procesos sigue abierto en segundo plano. El tiempo de juego ya no se cuenta. Usa \"Cerrar juego\" para terminarlo.",
+            "Le jeu semble fermé, mais un de ses processus tourne encore en arrière-plan. Le temps de jeu n’est plus compté. Utilise « Fermer le jeu » pour l’arrêter.",
+            "Das Spiel scheint geschlossen, aber einer seiner Prozesse läuft noch im Hintergrund. Die Spielzeit wird nicht mehr gezählt. Mit „Spiel beenden“ beendest du ihn.");
+
         // Imagens escolhidas à mão
         Add("Art_Customize", "Personalizar", "Customize", "Personalizar", "Personnaliser", "Anpassen");
         Add("Art_PageTitle", "Personalizar", "Customize", "Personalizar", "Personnaliser", "Anpassen");

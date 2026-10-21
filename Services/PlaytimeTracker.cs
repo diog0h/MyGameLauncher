@@ -15,12 +15,27 @@ namespace GameLauncher.Services;
 /// </summary>
 public sealed class PlaytimeTracker : IDisposable
 {
-    /// <summary>(jogo, a correr?) — chamado na thread de fundo.</summary>
-    public event Action<Game, bool>? RunningChanged;
+    /// <summary>(jogo, a correr?, quando começou/acabou) — chamado na thread de fundo.</summary>
+    public event Action<Game, bool, DateTime>? RunningChanged;
+
+    /// <summary>(jogo, preso?) — o processo continua aberto mas sem janela há algum tempo (ex.: o jogo não fechou bem).</summary>
+    public event Action<Game, bool>? StuckChanged;
+
+    /// <summary>Sem nenhuma janela durante este tempo, o jogo conta como "preso" e o tempo deixa de contar.</summary>
+    private static readonly TimeSpan StuckAfter = TimeSpan.FromMinutes(3);
+
+    private sealed class RunInfo
+    {
+        public DateTime Started;
+        public DateTime LastWindow;
+        public bool Stuck;
+        public List<int> ProcessIds = new();
+    }
 
     private readonly Dictionary<string, List<(Game Game, string Folder)>> _exeIndex =
         new(StringComparer.OrdinalIgnoreCase);
-    private readonly HashSet<string> _running = new();
+    // Por id do jogo (não pelo objeto): sobrevive a "Atualizar biblioteca", que cria jogos novos.
+    private readonly Dictionary<string, RunInfo> _running = new();
     private Timer? _timer;
     private int _busy;
 
@@ -84,7 +99,6 @@ public sealed class PlaytimeTracker : IDisposable
         Task.Run(() =>
         {
             BuildIndex(list);
-            lock (_exeIndex) _running.Clear();
             if (gen != Volatile.Read(ref _generation)) return; // entretanto houve outra atualização
             _timer = new Timer(_ => Tick(), null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
         });
@@ -132,14 +146,39 @@ public sealed class PlaytimeTracker : IDisposable
         }
     }
 
+    /// <summary>Processos do jogo que estão abertos agora (para o botão "Fechar jogo").</summary>
+    public List<int> ProcessIds(string gameId)
+    {
+        lock (_exeIndex) return _running.TryGetValue(gameId, out var info) ? info.ProcessIds.ToList() : new();
+    }
+
+    /// <summary>Quando o jogo deixou de ter janela, se estiver preso (null se não estiver).</summary>
+    public DateTime? StuckSince(string gameId)
+    {
+        lock (_exeIndex) return _running.TryGetValue(gameId, out var info) && info.Stuck ? info.LastWindow : null;
+    }
+
+    public bool IsStuck(string gameId)
+    {
+        lock (_exeIndex) return _running.TryGetValue(gameId, out var info) && info.Stuck;
+    }
+
     private void Tick()
     {
         if (Interlocked.Exchange(ref _busy, 1) == 1) return;
         try
         {
-            var nowRunning = new HashSet<Game>();
+            var found = new Dictionary<string, (Game Game, List<int> Pids, bool HasWindow)>();
             Process[] procs;
             try { procs = Process.GetProcesses(); } catch { return; }
+
+            void Add(Game g, Process p)
+            {
+                bool window = false;
+                try { window = p.MainWindowHandle != IntPtr.Zero; } catch { }
+                if (found.TryGetValue(g.Id, out var e)) { e.Pids.Add(p.Id); found[g.Id] = (e.Game, e.Pids, e.HasWindow || window); }
+                else found[g.Id] = (g, new List<int> { p.Id }, window);
+            }
 
             lock (_exeIndex)
             {
@@ -154,12 +193,12 @@ public sealed class PlaytimeTracker : IDisposable
                         {
                             // Caminho conhecido: só conta se o .exe estiver dentro da pasta do jogo.
                             foreach (var o in owners)
-                                if (IsInside(path, o.Folder)) nowRunning.Add(o.Game);
+                                if (IsInside(path, o.Folder)) Add(o.Game, p);
                         }
                         else if (owners.Count == 1 && !GenericNames.Contains(p.ProcessName))
                         {
                             // O Windows não deixou ler o caminho: confia no nome, se for único e não genérico.
-                            nowRunning.Add(owners[0].Game);
+                            Add(owners[0].Game, p);
                         }
                     }
                     catch { }
@@ -167,19 +206,47 @@ public sealed class PlaytimeTracker : IDisposable
                 }
             }
 
+            var now = DateTime.Now;
+            var events = new List<Action>();
             lock (_exeIndex)
             {
-                foreach (var g in nowRunning)
-                    if (_running.Add(g.Id)) RunningChanged?.Invoke(g, true);
-
-                foreach (var id in _running.ToList())
+                foreach (var (id, f) in found)
                 {
-                    if (nowRunning.Any(g => g.Id == id)) continue;
+                    if (!_running.TryGetValue(id, out var info))
+                    {
+                        info = _running[id] = new RunInfo { Started = now, LastWindow = now };
+                        var started = info.Started;
+                        events.Add(() => RunningChanged?.Invoke(f.Game, true, started));
+                    }
+                    info.ProcessIds = f.Pids;
+
+                    if (f.HasWindow)
+                    {
+                        info.LastWindow = now;
+                        if (info.Stuck) { info.Stuck = false; events.Add(() => StuckChanged?.Invoke(f.Game, false)); }
+                    }
+                    else if (!info.Stuck && now - info.LastWindow > StuckAfter)
+                    {
+                        // Sem janela há minutos: o jogo provavelmente fechou mal e ficou um processo pendurado.
+                        info.Stuck = true;
+                        events.Add(() => StuckChanged?.Invoke(f.Game, true));
+                        AppLog.Info($"{f.Game.Name}: o processo continua aberto mas sem janela (pids {string.Join(", ", f.Pids)})");
+                    }
+                }
+
+                foreach (var (id, info) in _running.ToList())
+                {
+                    if (found.ContainsKey(id)) continue;
                     _running.Remove(id);
                     var g = _exeIndex.Values.SelectMany(v => v).Select(v => v.Game).FirstOrDefault(x => x.Id == id);
-                    if (g is not null) RunningChanged?.Invoke(g, false);
+                    if (g is null) continue;
+                    // Se ficou pendurado, o tempo de jogo acaba quando a janela desapareceu (não quando o processo morreu).
+                    var end = info.Stuck ? info.LastWindow : now;
+                    events.Add(() => RunningChanged?.Invoke(g, false, end));
+                    if (info.Stuck) events.Add(() => StuckChanged?.Invoke(g, false));
                 }
             }
+            foreach (var e in events) e();
         }
         finally { Interlocked.Exchange(ref _busy, 0); }
     }

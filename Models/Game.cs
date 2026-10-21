@@ -64,6 +64,10 @@ public sealed class Game : INotifyPropertyChanged
     private bool _isRunning;
     public bool IsRunning { get => _isRunning; set { Set(ref _isRunning, value); Notify(nameof(PlayButtonText)); } }
 
+    private bool _isStuck;
+    /// <summary>O processo continua aberto, mas sem janela há minutos (o jogo provavelmente não fechou bem).</summary>
+    public bool IsStuck { get => _isStuck; set => Set(ref _isStuck, value); }
+
     private bool _isLaunching;
     public bool IsLaunching { get => _isLaunching; set { Set(ref _isLaunching, value); Notify(nameof(PlayButtonText)); } }
 

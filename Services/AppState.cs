@@ -34,8 +34,10 @@ public sealed class AppState
 
     private AppState()
     {
-        _tracker.RunningChanged += (g, running) =>
-            Application.Current?.Dispatcher.BeginInvoke(() => OnRunningChanged(g, running));
+        _tracker.RunningChanged += (g, running, time) =>
+            Application.Current?.Dispatcher.BeginInvoke(() => OnRunningChanged(g, running, time));
+        _tracker.StuckChanged += (g, stuck) =>
+            Application.Current?.Dispatcher.BeginInvoke(() => { if ((FindGame(g.Id) ?? g) is { } game) game.IsStuck = stuck; });
     }
 
     // ------------------------------------------------------------------ carregar
@@ -112,7 +114,7 @@ public sealed class AppState
                 g.TrackedSeconds = (long)t.Seconds;
                 g.TrackedLastPlayed = t.Last;
             }
-            if (_openSessions.ContainsKey(g.Id)) g.IsRunning = true;
+            if (_openSessions.ContainsKey(g.Id)) { g.IsRunning = true; g.IsStuck = _tracker.IsStuck(g.Id); }
         }
     }
 
@@ -391,27 +393,45 @@ public sealed class AppState
 
     // ------------------------------------------------------------------ tempo de jogo
 
-    private void OnRunningChanged(Game tracked, bool running)
+    private void OnRunningChanged(Game tracked, bool running, DateTime time)
     {
         var game = FindGame(tracked.Id) ?? tracked;
 
         if (running)
         {
-            _openSessions.TryAdd(game.Id, DateTime.Now);
+            _openSessions.TryAdd(game.Id, time);
             game.IsRunning = true;
             game.IsLaunching = false;
+            AppLog.Info($"A jogar: {game.Name}");
         }
         else
         {
             game.IsRunning = false;
-            CloseSession(game);
+            game.IsStuck = false;
+            CloseSession(game, time);
+            AppLog.Info($"Terminou: {game.Name}");
         }
     }
 
-    private void CloseSession(Game game)
+    /// <summary>Fecha à força os processos do jogo (para quando o jogo não fecha bem).</summary>
+    public void StopGame(Game game)
+    {
+        foreach (var pid in _tracker.ProcessIds(game.Id))
+        {
+            try
+            {
+                using var p = Process.GetProcessById(pid);
+                p.Kill(entireProcessTree: true);
+            }
+            catch (Exception ex) { AppLog.Error($"Não foi possível fechar o processo {pid} de {game.Name}", ex); }
+        }
+        AppLog.Info($"Fechado à força: {game.Name}");
+    }
+
+    private void CloseSession(Game game, DateTime? endTime = null)
     {
         if (!_openSessions.Remove(game.Id, out var start)) return;
-        var end = DateTime.Now;
+        var end = endTime ?? DateTime.Now;
         if ((end - start).TotalSeconds < 60) return; // ignora aberturas de poucos segundos
 
         Data.Sessions.Add(new PlaySession { GameId = game.Id, Start = start, End = end });
@@ -426,7 +446,7 @@ public sealed class AppState
     {
         _tracker.Stop();
         foreach (var id in _openSessions.Keys.ToList())
-            if (FindGame(id) is { } g) CloseSession(g);
+            if (FindGame(id) is { } g) CloseSession(g, _tracker.StuckSince(id)); // preso: conta só até a janela desaparecer
         Save();
     }
 }
