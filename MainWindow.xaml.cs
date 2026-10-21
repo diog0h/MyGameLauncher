@@ -622,7 +622,13 @@ public partial class MainWindow : Window
 
     private void PlayGame_Executed(object sender, ExecutedRoutedEventArgs e)
     {
-        if (GameFrom(e) is { } g) State.Play(g);
+        if (GameFrom(e) is not { } g) return;
+        if (!g.IsRunning) { State.Play(g); return; }
+
+        // Com o jogo aberto, o mesmo botão passa a "Parar" (fecha o jogo à força, depois de confirmar).
+        var ok = MessageBox.Show(Loc.F("Game_StopConfirm", g.Name), Loc.T("Game_Stop"),
+            MessageBoxButton.YesNo, MessageBoxImage.Warning);
+        if (ok == MessageBoxResult.Yes) State.StopGame(g);
     }
 
     private void ToggleFavorite_Executed(object sender, ExecutedRoutedEventArgs e)

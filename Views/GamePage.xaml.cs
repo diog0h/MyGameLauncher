@@ -48,13 +48,6 @@ public partial class GamePage : UserControl, IPage
         if (e.PropertyName == nameof(Game.Accent)) MainWindow.Current.SetAccent(_game.Accent);
     }
 
-    private void StopGame_Click(object sender, RoutedEventArgs e)
-    {
-        var ok = MessageBox.Show(Loc.F("Game_StopConfirm", _game.Name), Loc.T("Game_Stop"),
-            MessageBoxButton.YesNo, MessageBoxImage.Warning);
-        if (ok == MessageBoxResult.Yes) State.StopGame(_game);
-    }
-
     private void Customize_Click(object sender, RoutedEventArgs e) =>
         MainWindow.Current.Navigate(new ArtworkPage(_game));
 

@@ -124,7 +124,8 @@ public sealed class Game : INotifyPropertyChanged
 
     public string PlaytimeSummary => Loc.F("PlayedFor", PlaytimeText);
 
-    public string PlayButtonText => IsRunning ? Loc.T("Playing") : IsLaunching ? Loc.T("Launching") : Loc.T("Play");
+    /// <summary>Com o jogo aberto, o botão de jogar passa a ser o de parar.</summary>
+    public string PlayButtonText => IsRunning ? Loc.T("Game_Stop") : IsLaunching ? Loc.T("Launching") : Loc.T("Play");
 
     /// <summary>Volta a pedir todos os textos (depois de mudar de língua).</summary>
     public void RefreshTexts() => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(string.Empty));

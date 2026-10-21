@@ -53,7 +53,14 @@
                         <Button x:Name="HeroPlay" Style="{StaticResource PrimaryButton}" MinWidth="150"
                                 Command="{x:Static local:AppCommands.PlayGame}" CommandParameter="{Binding}">
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="&#xE768;" Style="{StaticResource Icon}" Margin="0,0,10,0"/>
+                                <!-- ▶ para jogar; ■ (quadrado cheio) para parar quando o jogo está aberto -->
+                                <Grid Margin="0,0,10,0" VerticalAlignment="Center">
+                                    <TextBlock Text="&#xE768;" Style="{StaticResource Icon}"
+                                               Visibility="{Binding IsRunning, Converter={StaticResource BoolToVis}, ConverterParameter=invert}"/>
+                                    <Rectangle Width="12" Height="12" RadiusX="2.5" RadiusY="2.5"
+                                               Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                               Visibility="{Binding IsRunning, Converter={StaticResource BoolToVis}}"/>
+                                </Grid>
                                 <TextBlock Text="{Binding PlayButtonText}"/>
                             </StackPanel>
                         </Button>
