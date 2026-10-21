@@ -73,7 +73,7 @@
                         <Button Style="{StaticResource GlassButton}" Margin="10,0,0,0" Click="StopGame_Click"
                                 Visibility="{Binding IsRunning, Converter={StaticResource BoolToVis}}">
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="&#xE71A;" Style="{StaticResource Icon}" Margin="0,0,8,0"/>
+                                <TextBlock Text="&#xE7E8;" Style="{StaticResource Icon}" Margin="0,0,8,0"/>
                                 <TextBlock Text="{l:Tr Game_Stop}"/>
                             </StackPanel>
                         </Button>
