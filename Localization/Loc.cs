@@ -97,6 +97,17 @@ public sealed class Loc : INotifyPropertyChanged
         Add("Add_Browse", "Escolher…", "Browse…", "Examinar…", "Parcourir…", "Durchsuchen…");
         Add("Add_FileFilter", "Programas e atalhos", "Programs and shortcuts", "Programas y accesos directos", "Programmes et raccourcis", "Programme und Verknüpfungen");
         Add("Add_AllFiles", "Todos os ficheiros", "All files", "Todos los archivos", "Tous les fichiers", "Alle Dateien");
+        Add("Add_Folder", "Pasta do jogo", "Game folder", "Carpeta del juego", "Dossier du jeu", "Spielordner");
+        Add("Add_FolderHint", "C:\\Jogos\\Jogo", "C:\\Games\\Game", "C:\\Juegos\\Juego", "C:\\Jeux\\Jeu", "C:\\Spiele\\Spiel");
+        Add("Add_FolderDesc",
+            "Serve para calcular o tamanho e para saber quando estás a jogar. Se o .exe estiver numa subpasta, escolhe a pasta principal do jogo.",
+            "Used to work out the size and to know when you're playing. If the .exe is in a subfolder, pick the game's main folder.",
+            "Sirve para calcular el tamaño y saber cuándo estás jugando. Si el .exe está en una subcarpeta, elige la carpeta principal del juego.",
+            "Sert à calculer la taille et à savoir quand tu joues. Si le .exe est dans un sous-dossier, choisis le dossier principal du jeu.",
+            "Wird für die Größe verwendet und um zu erkennen, wann du spielst. Liegt die .exe in einem Unterordner, wähle den Hauptordner des Spiels.");
+        Add("Add_ErrFolder", "Essa pasta não existe.", "That folder doesn't exist.", "Esa carpeta no existe.", "Ce dossier n’existe pas.", "Dieser Ordner existiert nicht.");
+        Add("Folder_Size", "Tamanho: {0}", "Size: {0}", "Tamaño: {0}", "Taille : {0}", "Größe: {0}");
+        Add("Folder_Measuring", "A calcular o tamanho…", "Calculating size…", "Calculando el tamaño…", "Calcul de la taille…", "Größe wird berechnet …");
         Add("Add_Name", "Nome", "Name", "Nombre", "Nom", "Name");
         Add("Add_NameHint", "Nome do jogo", "Game name", "Nombre del juego", "Nom du jeu", "Name des Spiels");
         Add("Add_Store", "Loja ou launcher", "Store or launcher", "Tienda o launcher", "Boutique ou launcher", "Store oder Launcher");

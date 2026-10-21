@@ -80,6 +80,7 @@ public sealed class AppState
 
         _tracker.Start(games);
         _ = LoadArtworkAsync(games);
+        _ = UpdateCustomSizesAsync();
         _ = SyncEpicPlaytimeAsync();
     }
 
@@ -175,6 +176,50 @@ public sealed class AppState
         Save();
         await LoadAsync();
         return FindGame(c.Id);
+    }
+
+    /// <summary>Muda a pasta principal de um jogo adicionado à mão (null = volta à pasta do .exe).</summary>
+    public async Task SetCustomFolderAsync(Game game, string? folder)
+    {
+        if (Data.CustomGames.FirstOrDefault(c => c.Id == game.Id) is not { } c) return;
+        c.Folder = string.IsNullOrWhiteSpace(folder) ? null : folder.TrimEnd('\\', '/');
+        Save();
+        await LoadAsync(); // a pasta muda a deteção do jogo aberto; o tamanho é recalculado a seguir
+    }
+
+    private bool _measuring, _measureAgain;
+
+    /// <summary>
+    /// Jogos adicionados à mão não dizem o tamanho: soma a pasta em segundo plano.
+    /// Só volta a medir passada uma semana ou se a pasta mudar.
+    /// </summary>
+    private async Task UpdateCustomSizesAsync()
+    {
+        if (_measuring) { _measureAgain = true; return; }
+        _measuring = true;
+        try
+        {
+          do
+          {
+            _measureAgain = false;
+            foreach (var c in Data.CustomGames.ToList())
+            {
+                var folder = CustomGames.GameFolder(c);
+                if (folder is null || !Directory.Exists(folder)) continue;
+                bool sameFolder = string.Equals(c.SizeFolder, folder, StringComparison.OrdinalIgnoreCase);
+                if (sameFolder && c.SizeCheckedUtc is { } t && DateTime.UtcNow - t < TimeSpan.FromDays(7)) continue;
+
+                var size = await Task.Run(() => CustomGames.FolderSize(folder));
+                c.SizeBytes = size;
+                c.SizeFolder = folder;
+                c.SizeCheckedUtc = DateTime.UtcNow;
+                if (FindGame(c.Id) is { } g) g.SizeBytes = size;
+                Save();
+            }
+          } while (_measureAgain);
+        }
+        catch (Exception ex) { AppLog.Error("Cálculo do tamanho dos jogos adicionados à mão", ex); }
+        finally { _measuring = false; }
     }
 
     public async Task RemoveCustomGameAsync(Game game)

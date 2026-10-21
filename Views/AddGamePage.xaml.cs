@@ -14,7 +14,7 @@ public partial class AddGamePage : UserControl, IPage
     public string Title => Loc.T("Add_Title");
 
     private AppState State => AppState.Current;
-    private bool _nameTouched;
+    private bool _nameTouched, _folderTouched;
 
     /// <summary>Sugestões de nomes de loja/launcher, além dos que já foram usados.</summary>
     private static readonly string[] SuggestedStores = { "Battle.net", "EA app", "GOG", "Riot Games", "Rockstar", "Xbox" };
@@ -23,6 +23,7 @@ public partial class AddGamePage : UserControl, IPage
     {
         InitializeComponent();
         NameBox.TextChanged += (_, _) => { if (NameBox.IsKeyboardFocused) _nameTouched = true; };
+        FolderBox.TextChanged += (_, _) => { if (FolderBox.IsKeyboardFocused) _folderTouched = true; };
         BuildStoreChips();
     }
 
@@ -61,8 +62,20 @@ public partial class AddGamePage : UserControl, IPage
 
     private void PathBox_TextChanged(object sender, TextChangedEventArgs e)
     {
+        var path = PathBox.Text.Trim().Trim('"');
+        if (!_folderTouched)
+            FolderBox.Text = Scanners.CustomGames.GameFolder(new CustomGame { Path = path }) ?? "";
         if (_nameTouched) return;
-        NameBox.Text = GuessName(PathBox.Text.Trim().Trim('"'));
+        NameBox.Text = GuessName(path);
+    }
+
+    private void BrowseFolder_Click(object sender, RoutedEventArgs e)
+    {
+        var dlg = new OpenFolderDialog { Title = Loc.T("Add_Folder") };
+        if (Directory.Exists(FolderBox.Text.Trim())) dlg.InitialDirectory = FolderBox.Text.Trim();
+        if (dlg.ShowDialog(Window.GetWindow(this)) != true) return;
+        FolderBox.Text = dlg.FolderName;
+        _folderTouched = true;
     }
 
     /// <summary>Nome do jogo a partir do ficheiro: descrição do .exe se existir, senão o nome do ficheiro.</summary>
@@ -92,9 +105,11 @@ public partial class AddGamePage : UserControl, IPage
         var store = StoreBox.Text.Trim();
         if (store.Length == 0) store = Loc.T("Add_Other");
 
+        var folder = FolderBox.Text.Trim().Trim('"');
         string? error = null;
         if (path.Length == 0 || (!File.Exists(path) && !path.Contains("://"))) error = Loc.T("Add_ErrFile");
         else if (name.Length == 0) error = Loc.T("Add_ErrName");
+        else if (folder.Length > 0 && !Directory.Exists(folder)) error = Loc.T("Add_ErrFolder");
 
         ErrorText.Text = error ?? "";
         ErrorText.Visibility = error is null ? Visibility.Collapsed : Visibility.Visible;
@@ -106,6 +121,9 @@ public partial class AddGamePage : UserControl, IPage
             Store = store,
             Path = path,
             Arguments = string.IsNullOrWhiteSpace(ArgsBox.Text) ? null : ArgsBox.Text.Trim(),
+            // Só guarda a pasta se for diferente da do .exe (assim acompanha o .exe se este mudar).
+            Folder = folder.Length > 0 && !string.Equals(folder.TrimEnd('\\'),
+                Scanners.CustomGames.GameFolder(new CustomGame { Path = path }), StringComparison.OrdinalIgnoreCase) ? folder : null,
         }, ArtEditor.Pending);
         if (game is not null) MainWindow.Current.Navigate(new GamePage(game), null, addToHistory: false);
     }

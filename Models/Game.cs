@@ -13,7 +13,13 @@ public sealed class Game : INotifyPropertyChanged
     public required string Name { get; init; }
     public required string Store { get; init; }
     public string? InstallPath { get; init; }
-    public long SizeBytes { get; init; }
+    private long _sizeBytes;
+    /// <summary>Tamanho no disco. Nos jogos adicionados à mão é calculado em segundo plano (pasta do jogo).</summary>
+    public long SizeBytes
+    {
+        get => _sizeBytes;
+        set { Set(ref _sizeBytes, value); Notify(nameof(SizeText), nameof(SubtitleText)); }
+    }
     public bool FullyInstalled { get; init; } = true;
 
     /// <summary>O que abrir para jogar: um URI do launcher (steam://, uplay://…) ou um .exe/atalho.</summary>

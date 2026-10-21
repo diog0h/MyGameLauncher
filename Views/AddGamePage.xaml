@@ -29,6 +29,19 @@
                          Tag="{l:Tr Add_FileHint}" TextChanged="PathBox_TextChanged"/>
             </DockPanel>
 
+            <!-- Pasta do jogo -->
+            <TextBlock Text="{l:Tr Add_Folder}" Style="{StaticResource FieldLabel}"/>
+            <DockPanel>
+                <Button DockPanel.Dock="Right" Style="{StaticResource GlassButton}" Margin="10,0,0,0" Click="BrowseFolder_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE8B7;" Style="{StaticResource Icon}" Margin="0,0,8,0"/>
+                        <TextBlock Text="{l:Tr Add_Browse}"/>
+                    </StackPanel>
+                </Button>
+                <TextBox x:Name="FolderBox" Style="{StaticResource RoundTextBox}" Padding="14,8" Tag="{l:Tr Add_FolderHint}"/>
+            </DockPanel>
+            <TextBlock Text="{l:Tr Add_FolderDesc}" Foreground="{StaticResource SubtleTextBrush}" TextWrapping="Wrap" Margin="0,8,0,0" FontSize="12.5"/>
+
             <!-- Nome -->
             <TextBlock Text="{l:Tr Add_Name}" Style="{StaticResource FieldLabel}"/>
             <TextBox x:Name="NameBox" Style="{StaticResource RoundTextBox}" Padding="14,8" Tag="{l:Tr Add_NameHint}"/>

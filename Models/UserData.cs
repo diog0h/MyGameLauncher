@@ -31,6 +31,14 @@ public sealed class CustomGame
     public string Store { get; set; } = "";
     public string Path { get; set; } = "";
     public string? Arguments { get; set; }
+
+    /// <summary>Pasta principal do jogo (null = a pasta do .exe). Usada para o tamanho e para saber quando está aberto.</summary>
+    public string? Folder { get; set; }
+
+    /// <summary>Tamanho calculado da pasta, a pasta medida e quando (para não voltar a somar tudo a cada arranque).</summary>
+    public long SizeBytes { get; set; }
+    public string? SizeFolder { get; set; }
+    public DateTime? SizeCheckedUtc { get; set; }
 }
 
 /// <summary>Caminhos das imagens escolhidas pelo utilizador (cópias guardadas na pasta "art" da app).</summary>
